@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.dp</groupId>
+        <artifactId>ai-code-agent</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>ai-code-agent-common</artifactId>
+    <name>ai-code-agent-common</name>
+    <description>通用工具、常量、异常、统一响应体，纯 JDK 零 Spring 依赖</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>

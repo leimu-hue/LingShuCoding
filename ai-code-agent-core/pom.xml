@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.dp</groupId>
+        <artifactId>ai-code-agent</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>ai-code-agent-core</artifactId>
+    <name>ai-code-agent-core</name>
+    <description>核心业务逻辑：Spring、Spring AI、xbatis ORM</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dp</groupId>
+            <artifactId>ai-code-agent-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Spring 核心容器（@Service/@Configuration 等） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Spring AI：OpenAI 模型接入（含 webclient/restclient） -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+        <!-- xbatis ORM -->
+        <dependency>
+            <groupId>cn.xbatis</groupId>
+            <artifactId>xbatis-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.xbatis</groupId>
+            <artifactId>xbatis-core</artifactId>
+        </dependency>
+        <!-- 对象映射 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>

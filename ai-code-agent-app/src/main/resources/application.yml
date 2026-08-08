@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: ai-code-agent
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_code_agent
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+  ai:
+    openai:
+      base-url: https://api.openai.com
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+server:
+  port: 8080
