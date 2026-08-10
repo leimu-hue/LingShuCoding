@@ -4,11 +4,11 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 
 export default function App() {
-  return (
-    <ConfigProvider locale={zhCN}>
-      <AntdApp>
-        <RouterProvider router={router} />
-      </AntdApp>
-    </ConfigProvider>
-  )
+    return (
+        <ConfigProvider locale={zhCN}>
+            <AntdApp>
+                <RouterProvider router={router} />
+            </AntdApp>
+        </ConfigProvider>
+    )
 }
