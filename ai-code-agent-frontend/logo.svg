@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6C63FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3F3D9E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景圆（可选） -->
+  <circle cx="256" cy="256" r="240" fill="#f0f4ff" />
+
+  <!-- 大脑轮廓（简化版） -->
+  <path d="M256 80 C160 80 96 144 96 224 C96 280 128 328 176 356 L176 400 C176 408 184 416 192 416 L224 416 L224 376 L288 376 L288 416 L320 416 C328 416 336 408 336 400 L336 356 C384 328 416 280 416 224 C416 144 352 80 256 80 Z"
+        fill="url(#grad)" opacity="0.15" />
+
+  <!-- 大脑沟回（抽象线） -->
+  <path d="M180 180 Q220 160 240 200 Q260 240 300 210"
+        stroke="url(#grad)" stroke-width="8" fill="none" stroke-linecap="round" />
+  <path d="M160 240 Q200 260 220 220 Q240 180 280 200"
+        stroke="url(#grad)" stroke-width="8" fill="none" stroke-linecap="round" />
+  <path d="M200 300 Q240 280 260 320 Q280 360 320 330"
+        stroke="url(#grad)" stroke-width="8" fill="none" stroke-linecap="round" />
+
+  <!-- 尖括号代码符号 < > 放在大脑中间 -->
+  <text x="256" y="296" font-family="Consolas, monospace" font-size="120" font-weight="bold"
+        fill="url(#grad)" text-anchor="middle" dominant-baseline="middle">
+    &lt;/&gt;
+  </text>
+
+  <!-- 闪烁的星星（AI 魔法） -->
+  <circle cx="140" cy="140" r="12" fill="#FFD700" />
+  <circle cx="380" cy="130" r="8" fill="#FFD700" />
+  <circle cx="420" cy="280" r="6" fill="#FFD700" />
+  <circle cx="100" cy="340" r="10" fill="#FFD700" />
+
+  <!-- 小星星光芒（十字线） -->
+  <path d="M140 120 L140 160 M120 140 L160 140" stroke="#FFD700" stroke-width="4" stroke-linecap="round" />
+  <path d="M380 118 L380 142 M368 130 L392 130" stroke="#FFD700" stroke-width="3" stroke-linecap="round" />
+</svg>

@@ -22,6 +22,8 @@ export default function AdminLayout() {
     const toggleCollapsed = useAppShellStore((state) => state.toggleCollapsed)
     const navigate = useNavigate()
     const location = useLocation()
+    // 后台挂在 /admin 下，菜单 key 与选中态按 /admin 前缀剥离后的路径匹配
+    const pathname = location.pathname.replace(/^\/admin/, '') || '/'
 
     return (
         <Layout style={{ height: '100%' }}>
@@ -41,9 +43,9 @@ export default function AdminLayout() {
                 <Menu
                     theme="dark"
                     mode="inline"
-                    selectedKeys={[location.pathname]}
+                    selectedKeys={[pathname]}
                     items={menuItems}
-                    onClick={({ key }) => navigate(key)}
+                    onClick={({ key }) => navigate(`/admin${key}`)}
                 />
             </Sider>
             <Layout>

@@ -6,6 +6,11 @@ body,
     padding: 0;
 }
 
+/* antd App 包装层：继承高度，保证 Layout 的 height: 100% 链条完整 */
+#root > .ant-app {
+    height: 100%;
+}
+
 * {
     box-sizing: border-box;
 }

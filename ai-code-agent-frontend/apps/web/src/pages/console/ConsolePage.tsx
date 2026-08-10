@@ -47,7 +47,7 @@ export default function ConsolePage() {
                 <Alert
                     type="error"
                     showIcon
-                    message="请求失败"
+                    title="请求失败"
                     description={`${error}（请确认后端已启动，/api 已代理至 http://localhost:8080）`}
                     action={
                         <Button size="small" danger onClick={() => void loadUsers()}>

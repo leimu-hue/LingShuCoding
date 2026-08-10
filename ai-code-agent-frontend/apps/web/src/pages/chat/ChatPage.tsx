@@ -8,7 +8,7 @@ export default function ChatPage() {
             <Alert
                 type="info"
                 showIcon
-                message="SSE 流式能力已就绪"
+                title="SSE 流式能力已就绪"
                 description="通过 @ai-code-agent/shared 的 streamSse 可与后端 AI 接口流式对话，本页交互待实现。"
                 style={{ marginBottom: 16 }}
             />

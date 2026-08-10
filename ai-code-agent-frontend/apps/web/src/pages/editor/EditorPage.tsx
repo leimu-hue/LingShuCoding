@@ -7,7 +7,7 @@ import {
     useEdgesState,
     useNodesState,
 } from '@xyflow/react'
-import { Card, Empty, Input, Typography } from 'antd'
+import { Card, Empty, Flex, Input, Typography } from 'antd'
 import { useCallback, useState } from 'react'
 
 const initialNodes: AppElementNode[] = [
@@ -83,11 +83,13 @@ export default function EditorPage() {
                             <Typography.Text type="secondary">
                                 节点 ID：{selected.id}
                             </Typography.Text>
-                            <Input
-                                addonBefore="名称"
-                                value={selected.data?.label ?? ''}
-                                onChange={(event) => updateLabel(event.target.value)}
-                            />
+                            <Flex align="center" gap={8}>
+                                <Typography.Text style={{ flexShrink: 0 }}>名称</Typography.Text>
+                                <Input
+                                    value={selected.data?.label ?? ''}
+                                    onChange={(event) => updateLabel(event.target.value)}
+                                />
+                            </Flex>
                         </div>
                     ) : (
                         <Empty
