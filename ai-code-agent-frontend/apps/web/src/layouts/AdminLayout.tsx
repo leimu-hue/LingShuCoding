@@ -5,7 +5,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from '@ant-design/icons'
-import { Layout, Menu, Typography } from 'antd'
+import { Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAppShellStore } from '../store/appShell'
 
@@ -22,6 +22,7 @@ export default function AdminLayout() {
     const toggleCollapsed = useAppShellStore((state) => state.toggleCollapsed)
     const navigate = useNavigate()
     const location = useLocation()
+    const { token } = theme.useToken()
     // 后台挂在 /admin 下，菜单 key 与选中态按 /admin 前缀剥离后的路径匹配
     const pathname = location.pathname.replace(/^\/admin/, '') || '/'
 
@@ -52,7 +53,7 @@ export default function AdminLayout() {
                 <Header
                     style={{
                         padding: '0 16px',
-                        background: '#fff',
+                        background: token.colorBgContainer,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
@@ -66,7 +67,7 @@ export default function AdminLayout() {
                 <Content
                     style={{
                         margin: 16,
-                        background: '#fff',
+                        background: token.colorBgContainer,
                         padding: 16,
                         borderRadius: 8,
                         overflow: 'auto',

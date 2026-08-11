@@ -2,7 +2,7 @@ import { CommentOutlined } from '@ant-design/icons'
 import { Avatar, Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import AppFooter from '../components/AppFooter'
-import logo from '../../../../logo.svg'
+import logo from '@root/logo.svg'
 
 const { Header, Content } = Layout
 

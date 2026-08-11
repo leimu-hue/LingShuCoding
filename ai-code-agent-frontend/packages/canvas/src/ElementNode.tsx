@@ -14,15 +14,15 @@ const containerStyle: React.CSSProperties = {
     gap: 6,
     padding: '8px 14px',
     borderRadius: 8,
-    border: '1px solid #d9d9d9',
-    background: '#fff',
+    border: '1px solid var(--ant-color-border)',
+    background: 'var(--ant-color-bg-container)',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
     fontSize: 14,
 }
 
 const selectedStyle: React.CSSProperties = {
-    borderColor: '#1677ff',
-    boxShadow: '0 0 0 2px rgba(22, 119, 255, 0.2)',
+    borderColor: 'var(--ant-color-primary)',
+    boxShadow: '0 0 0 2px var(--ant-color-primary-bg)',
 }
 
 export function ElementNode({ data, selected }: NodeProps<AppElementNode>) {

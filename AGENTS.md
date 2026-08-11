@@ -51,7 +51,7 @@ MapStruct 转换器统一放在各模块的 `converter/` 包下。
 
 ## 开发工作流（superpowers 技能）
 
-按流程使用以下 `skill://` 技能（已安装于 `.opencode/skills/`）：
+按流程使用以下 `skill://` 技能:
 
 1. `skill://brainstorming` — 任何新功能/修改行为前，先澄清需求并产出设计
 2. `skill://writing-plans` — 设计确认后，将任务拆分为细粒度实施计划
@@ -87,3 +87,8 @@ MapStruct 转换器统一放在各模块的 `converter/` 包下。
 - **操作时机**：在接口代码提交前，执行 apifox-cli 命令，确保云端文档与代码一致。
 - **内容覆盖**：包括请求/响应结构、参数说明、错误码、示例等。
 - **验证**：更新后需在 Apifox 平台确认文档生效，方可提交代码。
+
+## 设计前端
+当你需要设计前端界面的时候，**必须**使用 `skill://antd`
+
+**你需要从 .agents/skills 加载上面所说的技能**

@@ -1,4 +1,6 @@
-import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios'
+import { authHeaders } from '../auth'
+import { reportApiError } from '../errorBus'
 import { type Result, SUCCESS_CODE } from '../types/result'
 
 export interface RequestOptions extends AxiosRequestConfig {
@@ -6,11 +8,21 @@ export interface RequestOptions extends AxiosRequestConfig {
      * 不检查统一响应体 code，直接返回原始响应（用于非 Result 包装的接口）
      */
     raw?: boolean
+    /**
+     * 为 true 时不向全局错误总线上报（由调用方自行处理错误 UI，例如页面内联提示）
+     */
+    silent?: boolean
 }
 
 export const request = axios.create({
     baseURL: import.meta.env?.VITE_API_BASE_URL ?? '/api',
     timeout: 30_000,
+})
+
+// 请求拦截器：注入鉴权头
+request.interceptors.request.use((config) => {
+    config.headers = new AxiosHeaders(config.headers).set(authHeaders())
+    return config
 })
 
 request.interceptors.response.use(
@@ -20,7 +32,11 @@ request.interceptors.response.use(
         }
         const body = response.data as Result
         if (body && typeof body === 'object' && 'code' in body && body.code !== SUCCESS_CODE) {
-            return Promise.reject(new Error(body.message || `业务错误码: ${body.code}`))
+            const message = body.message || `业务错误码: ${body.code}`
+            if (!(response.config as RequestOptions).silent) {
+                reportApiError(message)
+            }
+            return Promise.reject(new Error(message))
         }
         return response
     },
@@ -28,6 +44,9 @@ request.interceptors.response.use(
         const message = error.response?.data
             ? String((error.response.data as Result).message ?? `HTTP ${error.response.status}`)
             : error.message
+        if (!(error.config as RequestOptions | undefined)?.silent) {
+            reportApiError(message)
+        }
         return Promise.reject(new Error(message))
     },
 )
