@@ -4,9 +4,12 @@ import {
     DeploymentUnitOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    SafetyCertificateOutlined,
+    TeamOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import UserMenu from '../components/UserMenu'
 import { useAppShellStore } from '../store/appShell'
 
 const { Header, Sider, Content } = Layout
@@ -15,6 +18,8 @@ const menuItems = [
     { key: '/chat', icon: <CommentOutlined />, label: 'AI 对话生成' },
     { key: '/console', icon: <AppstoreOutlined />, label: '应用管理' },
     { key: '/editor', icon: <DeploymentUnitOutlined />, label: '可视化编辑器' },
+    { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
+    { key: '/roles', icon: <SafetyCertificateOutlined />, label: '角色管理' },
 ]
 
 export default function AdminLayout() {
@@ -63,6 +68,8 @@ export default function AdminLayout() {
                         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                     </span>
                     <Typography.Text type="secondary">AI 零代码应用生成平台</Typography.Text>
+                    <div style={{ flex: 1 }} />
+                    <UserMenu />
                 </Header>
                 <Content
                     style={{

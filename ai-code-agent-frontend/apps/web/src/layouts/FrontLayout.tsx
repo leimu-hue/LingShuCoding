@@ -1,7 +1,8 @@
 import { CommentOutlined } from '@ant-design/icons'
-import { Avatar, Layout, Menu, Typography, theme } from 'antd'
+import { Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import AppFooter from '../components/AppFooter'
+import UserMenu from '../components/UserMenu'
 import logo from '@root/logo.svg'
 
 const { Header, Content } = Layout
@@ -56,9 +57,8 @@ export default function FrontLayout() {
                         background: 'transparent',
                     }}
                 />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    <Avatar src={logo} alt="用户头像" size={32} />
-                    <Typography.Text>AI 用户</Typography.Text>
+                <div style={{ flexShrink: 0 }}>
+                    <UserMenu />
                 </div>
             </Header>
             <Content

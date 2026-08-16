@@ -1,4 +1,4 @@
-import { authHeaders } from '../auth.ts'
+import { authHeaders } from '../auth'
 
 export interface SseEvent {
     data: string
