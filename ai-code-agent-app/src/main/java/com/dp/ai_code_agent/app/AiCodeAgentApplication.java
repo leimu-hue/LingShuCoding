@@ -8,7 +8,7 @@ import org.mybatis.spring.annotation.MapperScan;
  * 应用入口
  */
 @SpringBootApplication(scanBasePackages = "com.dp.ai_code_agent")
-@MapperScan("com.dp.ai_code_agent.core.mapper")
+@MapperScan({"com.dp.ai_code_agent.core.mapper", "com.dp.ai_code_agent.user.local.mapper"})
 public class AiCodeAgentApplication {
 
     static void main(String[] args) {
