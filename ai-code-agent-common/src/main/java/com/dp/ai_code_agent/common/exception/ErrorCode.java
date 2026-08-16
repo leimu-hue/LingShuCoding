@@ -11,8 +11,16 @@ public enum ErrorCode {
     SUCCESS(0, "成功"),
     BAD_REQUEST(400, "参数错误"),
     UNAUTHORIZED(401, "未授权"),
+    FORBIDDEN(403, "无权限访问"),
     NOT_FOUND(404, "资源不存在"),
-    INTERNAL_ERROR(500, "系统内部错误");
+    INTERNAL_ERROR(500, "系统内部错误"),
+
+    // 用户模块
+    USERNAME_EXISTS(1001, "用户名已存在"),
+    LOGIN_FAILED(1002, "用户名或密码错误"),
+    ACCOUNT_DISABLED(1003, "账号已被禁用"),
+    TOKEN_INVALID(1004, "登录已失效"),
+    TOKEN_EXPIRED(1005, "登录已过期");
 
     private final int code;
 
