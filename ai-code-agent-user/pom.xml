@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.dp</groupId>
+        <artifactId>ai-code-agent</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>ai-code-agent-user</artifactId>
+    <name>ai-code-agent-user</name>
+    <description>用户模块：SPI 契约 + 本地 RBAC 实现</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dp</groupId>
+            <artifactId>ai-code-agent-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Spring 核心容器（@Service/@Configuration/@AutoConfiguration 等） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <!-- xbatis ORM -->
+        <dependency>
+            <groupId>cn.xbatis</groupId>
+            <artifactId>xbatis-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.xbatis</groupId>
+            <artifactId>xbatis-core</artifactId>
+        </dependency>
+        <!-- Redis 会话 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- 密码哈希 -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <!-- 对象映射 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

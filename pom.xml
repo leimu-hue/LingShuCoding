@@ -18,6 +18,7 @@
     <modules>
         <module>ai-code-agent-common</module>
         <module>ai-code-agent-core</module>
+        <module>ai-code-agent-user</module>
         <module>ai-code-agent-web</module>
         <module>ai-code-agent-app</module>
     </modules>
