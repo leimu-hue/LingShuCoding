@@ -9,8 +9,9 @@
 | 语言   | Java 25                                   |
 | 框架   | Spring Boot 4.1                           |
 | AI   | Spring AI 2.0（OpenAI / ChatGPT）           |
-| ORM  | Xbatis（MyBatis 风格，`DemoUserMapper` 无 XML） |
+| ORM  | Xbatis（MyBatis 风格，无 XML）               |
 | 数据库  | PostgreSQL，Flyway 管理迁移                    |
+| 会话   | Redis（Opaque Token）                        |
 | 对象映射 | MapStruct                                 |
 | 构建   | Maven                                     |
 
@@ -20,7 +21,8 @@
 ai-code-agent/
 ├── ai-code-agent-common/   # 通用工具、常量、异常、统一响应体
 ├── ai-code-agent-core/     # 核心业务逻辑：实体、Mapper、Service、DTO、Converter
-├── ai-code-agent-web/      # Web 层：REST 控制器、全局异常处理、CORS、过滤器、拦截器
+├── ai-code-agent-user/     # 用户模块：spi 契约 + local RBAC 实现（可替换）
+├── ai-code-agent-web/      # Web 层：REST 控制器、Security、全局异常处理、CORS
 └── ai-code-agent-app/      # 启动模块：入口、配置（application.yml）、数据库迁移脚本
 ```
 
@@ -44,27 +46,22 @@ java -jar ai-code-agent-app/target/ai-code-agent-*.jar
 
 ### 3. 验证
 
+用户模块接口（详见 `docs/superpowers/specs/2026-08-16-user-module-design.md`）：
+
 ```bash
-# 查询单个用户
-curl http://localhost:8080/api/demo-users/1
+# 注册
+curl -X POST http://localhost:8080/api/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"alice","password":"123456","nickname":"Alice"}'
 
-# 查询全部用户
-curl http://localhost:8080/api/demo-users
-```
+# 登录（返回 token）
+curl -X POST http://localhost:8080/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"admin123"}'
 
-示例响应：
-
-```json
-{
-  "code": 0,
-  "message": "OK",
-  "data": {
-    "id": 1,
-    "name": "zhangsan",
-    "age": 18,
-    "__xbatisRowCount": null
-  }
-}
+# 带 token 获取当前用户
+curl http://localhost:8080/api/auth/me \
+  -H 'Authorization: Bearer <token>'
 ```
 
 ## 配置说明
@@ -74,8 +71,10 @@ curl http://localhost:8080/api/demo-users
 ```yaml
 spring:
   datasource:          # 数据库连接
+  data.redis:          # 会话存储（Redis）
   ai.openai:           # OpenAI 配置（api-key 支持环境变量注入）
 
+app.user:             # 用户模块：provider=local 为自研实现，可替换
 web.cors:             # 全局跨域配置
   # allowed-origin-patterns: ["*"]
   # allowed-methods: GET/POST/PUT/DELETE/PATCH/OPTIONS
