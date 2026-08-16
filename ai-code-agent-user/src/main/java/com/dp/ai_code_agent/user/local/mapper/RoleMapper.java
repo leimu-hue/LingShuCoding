@@ -19,4 +19,8 @@ public interface RoleMapper extends MybatisMapper<Role> {
     default List<Role> selectByIds(Collection<Long> ids) {
         return QueryChain.of(this).in(Role::getId, ids).list();
     }
+
+    default List<Role> listAll() {
+        return QueryChain.of(this).list();
+    }
 }

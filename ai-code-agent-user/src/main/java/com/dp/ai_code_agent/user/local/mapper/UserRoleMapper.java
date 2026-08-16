@@ -16,6 +16,10 @@ public interface UserRoleMapper extends MybatisMapper<UserRole> {
         return QueryChain.of(this).eq(UserRole::getUserId, userId).list();
     }
 
+    default List<UserRole> selectByRoleId(Long roleId) {
+        return QueryChain.of(this).eq(UserRole::getRoleId, roleId).list();
+    }
+
     default int deleteByUserId(Long userId) {
         return DeleteChain.of(this).eq(UserRole::getUserId, userId).execute();
     }
