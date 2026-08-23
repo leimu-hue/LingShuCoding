@@ -1,7 +1,7 @@
 import { SendOutlined, StopOutlined } from '@ant-design/icons'
 import { App as AntdApp, Button, Input, Spin, Typography, theme } from 'antd'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { streamSse } from '@ai-code-agent/shared'
+import { streamSse, isUnauthorizedError } from '@ai-code-agent/shared'
 
 interface ChatMessage {
     id: string
@@ -52,6 +52,17 @@ export default function ChatPage() {
             onDone: () => setLoading(false),
             onError: (err) => {
                 setLoading(false)
+                if (isUnauthorizedError(err)) {
+                    // 401 会话过期已由全局桥处理（清凭证 + 跳转登录 + 提示一次），此处不再重复弹错误
+                    setMessages((prev) =>
+                        prev.map((m) =>
+                            m.id === botId && !m.content
+                                ? { ...m, content: '（登录已过期，请重新登录）' }
+                                : m,
+                        ),
+                    )
+                    return
+                }
                 message.error(err instanceof Error ? err.message : '对话请求失败')
                 setMessages((prev) =>
                     prev.map((m) =>

@@ -1,22 +1,10 @@
-export interface PermissionDTO {
-    id: number
-    code: string
-    name: string
-}
-
-export interface RoleDTO {
-    id: number
-    code: string
-    name: string
-    permissions: PermissionDTO[]
-}
+export type UserRole = 'ADMIN' | 'USER'
 
 export interface UserIdentity {
     id: number
     username: string
-    nickname: string | null
-    roles: RoleDTO[]
-    permissions: PermissionDTO[]
+    nickname: string
+    userRole: UserRole
     enabled: boolean
 }
 
@@ -28,10 +16,10 @@ export interface LoginResult {
 export interface UserAdminDTO {
     id: number
     username: string
-    nickname: string | null
+    nickname: string
+    userRole: UserRole
     enabled: boolean
-    createdAt: string | null
-    roles: RoleDTO[]
+    createdTime: string | null
 }
 
 export interface PageResult<T> {

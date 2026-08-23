@@ -52,7 +52,11 @@ export default function RegisterPage() {
                             { min: 3, max: 64, message: '用户名长度 3-64 位' },
                         ]}
                     >
-                        <Input prefix={<UserOutlined />} placeholder="用户名（3-64 位）" autoComplete="username" />
+                        <Input
+                            prefix={<UserOutlined />}
+                            placeholder="用户名（3-64 位）"
+                            autoComplete="username"
+                        />
                     </Form.Item>
                     <Form.Item name="nickname" rules={[{ max: 64, message: '昵称不超过 64 位' }]}>
                         <Input prefix={<SmileOutlined />} placeholder="昵称（可选）" />
@@ -64,7 +68,11 @@ export default function RegisterPage() {
                             { min: 6, max: 64, message: '密码长度 6-64 位' },
                         ]}
                     >
-                        <Input.Password prefix={<LockOutlined />} placeholder="密码（6-64 位）" autoComplete="new-password" />
+                        <Input.Password
+                            prefix={<LockOutlined />}
+                            placeholder="密码（6-64 位）"
+                            autoComplete="new-password"
+                        />
                     </Form.Item>
                     <Form.Item
                         name="confirm"
@@ -81,7 +89,11 @@ export default function RegisterPage() {
                             }),
                         ]}
                     >
-                        <Input.Password prefix={<LockOutlined />} placeholder="确认密码" autoComplete="new-password" />
+                        <Input.Password
+                            prefix={<LockOutlined />}
+                            placeholder="确认密码"
+                            autoComplete="new-password"
+                        />
                     </Form.Item>
                     <Form.Item style={{ marginBottom: 12 }}>
                         <Button type="primary" htmlType="submit" block loading={loading}>

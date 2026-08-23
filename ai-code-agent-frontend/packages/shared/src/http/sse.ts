@@ -1,9 +1,20 @@
-import { authHeaders } from '../auth'
+import { authHeaders } from '../auth.ts'
+import { reportSessionExpired } from '../errorBus.ts'
 
 export interface SseEvent {
     data: string
     event?: string
     id?: string
+}
+
+/** 带 HTTP 状态的请求错误，供调用方区分 401 会话过期，避免重复提示 */
+export interface SseRequestError extends Error {
+    status?: number
+}
+
+/** 是否为会话过期（401）导致的请求错误 */
+export function isUnauthorizedError(error: unknown): error is SseRequestError {
+    return error instanceof Error && (error as SseRequestError).status === 401
 }
 
 export interface StreamSseOptions {
@@ -79,7 +90,14 @@ export async function streamSse(options: StreamSseOptions): Promise<void> {
             signal,
         })
         if (!response.ok || !response.body) {
-            throw new Error(`SSE 请求失败: HTTP ${response.status}`)
+            const status = response.status
+            if (status === 401) {
+                // 会话过期：交由全局桥清凭证 + 跳转登录 + 提示一次
+                reportSessionExpired()
+            }
+            throw Object.assign(new Error(`SSE 请求失败: HTTP ${status}`), {
+                status,
+            }) as SseRequestError
         }
         const reader = response.body.getReader()
         const decoder = new TextDecoder()

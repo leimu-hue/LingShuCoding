@@ -4,7 +4,6 @@ import {
     DeploymentUnitOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    SafetyCertificateOutlined,
     TeamOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu, Typography, theme } from 'antd'
@@ -19,7 +18,6 @@ const menuItems = [
     { key: '/console', icon: <AppstoreOutlined />, label: '应用管理' },
     { key: '/editor', icon: <DeploymentUnitOutlined />, label: '可视化编辑器' },
     { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
-    { key: '/roles', icon: <SafetyCertificateOutlined />, label: '角色管理' },
 ]
 
 export default function AdminLayout() {

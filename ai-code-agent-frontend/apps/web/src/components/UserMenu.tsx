@@ -24,7 +24,12 @@ export default function UserMenu() {
         <Dropdown
             menu={{
                 items: [
-                    { key: 'logout', icon: <LogoutOutlined />, label: '退出登录', onClick: handleLogout },
+                    {
+                        key: 'logout',
+                        icon: <LogoutOutlined />,
+                        label: '退出登录',
+                        onClick: handleLogout,
+                    },
                 ],
             }}
         >

@@ -1,12 +1,12 @@
 import { http } from '@ai-code-agent/shared'
-import type { PageResult, RoleDTO, UserAdminDTO } from '../types/user'
+import type { PageResult, UserAdminDTO, UserRole } from '../types/user'
 
 export interface UserPageParams {
     page?: number
     size?: number
     keyword?: string
     status?: number
-    roleId?: number
+    userRole?: UserRole
 }
 
 export function listUsers(params: UserPageParams) {
@@ -18,17 +18,9 @@ export function setUserStatus(id: number, enabled: boolean) {
 }
 
 export function resetPassword(id: number, newPassword: string) {
-    return http<void>({ url: `/admin/users/${id}/reset-password`, method: 'POST', data: { newPassword } })
-}
-
-export function assignRoles(id: number, roleIds: number[]) {
-    return http<void>({ url: `/admin/users/${id}/roles`, method: 'PUT', data: { roleIds } })
-}
-
-export function listRoles() {
-    return http<RoleDTO[]>({ url: '/admin/roles', method: 'GET' })
-}
-
-export function grantPermissions(roleId: number, permissionIds: number[]) {
-    return http<void>({ url: `/admin/roles/${roleId}/permissions`, method: 'PUT', data: { permissionIds } })
+    return http<void>({
+        url: `/admin/users/${id}/reset-password`,
+        method: 'POST',
+        data: { newPassword },
+    })
 }

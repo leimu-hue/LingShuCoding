@@ -12,6 +12,8 @@ interface AuthState {
     login: (username: string, password: string) => Promise<void>
     register: (username: string, password: string, nickname?: string) => Promise<void>
     logout: () => Promise<void>
+    /** 仅清理本地凭证与状态（不调用后端），用于会话过期时强制下线 */
+    clearSession: () => void
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
@@ -52,6 +54,11 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         } catch {
             // 忽略注销接口失败，本地状态照常清理
         }
+        setAuthToken(null)
+        set({ token: null, user: null })
+    },
+
+    clearSession: () => {
         setAuthToken(null)
         set({ token: null, user: null })
     },

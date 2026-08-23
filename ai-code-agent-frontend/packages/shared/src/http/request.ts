@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios'
-import { authHeaders } from '../auth'
-import { reportApiError } from '../errorBus'
-import { type Result, SUCCESS_CODE } from '../types/result'
+import { authHeaders } from '../auth.ts'
+import { reportApiError, reportSessionExpired } from '../errorBus.ts'
+import { type Result, SUCCESS_CODE } from '../types/result.ts'
 
 export interface RequestOptions extends AxiosRequestConfig {
     /**
@@ -41,6 +41,12 @@ request.interceptors.response.use(
         return response
     },
     (error: AxiosError) => {
+        // 会话过期 / 未登录：统一走会话过期事件（清凭证 + 跳转登录 + 去重提示），
+        // 不再按普通错误弹「未授权」提示，避免并发请求各自弹一次。
+        if (error.response?.status === 401) {
+            reportSessionExpired()
+            return Promise.reject(new Error('登录已过期，请重新登录'))
+        }
         const message = error.response?.data
             ? String((error.response.data as Result).message ?? `HTTP ${error.response.status}`)
             : error.message

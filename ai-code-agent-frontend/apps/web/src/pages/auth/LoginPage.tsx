@@ -46,8 +46,15 @@ export default function LoginPage() {
                     AI 零代码应用生成平台
                 </Typography.Title>
                 <Form<LoginForm> onFinish={onFinish} size="large">
-                    <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
-                        <Input prefix={<UserOutlined />} placeholder="用户名" autoComplete="username" />
+                    <Form.Item
+                        name="username"
+                        rules={[{ required: true, message: '请输入用户名' }]}
+                    >
+                        <Input
+                            prefix={<UserOutlined />}
+                            placeholder="用户名"
+                            autoComplete="username"
+                        />
                     </Form.Item>
                     <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
                         <Input.Password

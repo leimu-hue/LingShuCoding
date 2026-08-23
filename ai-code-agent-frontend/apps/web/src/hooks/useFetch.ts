@@ -21,10 +21,12 @@ export function useFetch<T>(
     const [data, setData] = useState<T | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    // 用 ref 保存最新 config，避免 config 变化时重复触发请求（最新值模式）。
+    // 在 effect 中同步 ref（而非 render 期间），符合 Rules of React，React Compiler 可正常优化。
     const configRef = useRef(config)
-    // 用 ref 保存最新 config，避免在 config 变化时重复触发请求（最新值模式）
-    // eslint-disable-next-line react-hooks/refs -- 在 render 期间写入 ref 以持有最新 config
-    configRef.current = config
+    useEffect(() => {
+        configRef.current = config
+    })
     const mountedRef = useRef(true)
     useEffect(() => {
         mountedRef.current = true

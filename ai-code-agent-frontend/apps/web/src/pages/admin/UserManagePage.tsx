@@ -2,7 +2,7 @@ import { App, Button, Form, Input, Modal, Select, Space, Switch, Table, Tag } fr
 import type { TableProps } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import * as adminApi from '../../api/admin'
-import type { RoleDTO, UserAdminDTO } from '../../types/user'
+import type { UserAdminDTO, UserRole } from '../../types/user'
 
 /** 展示创建时间（ISO 串 → YYYY-MM-DD HH:mm） */
 function formatDate(value: string | null): string {
@@ -12,20 +12,23 @@ function formatDate(value: string | null): string {
     return value.replace('T', ' ').slice(0, 16)
 }
 
+const roleMeta: Record<UserRole, { color: string; label: string }> = {
+    ADMIN: { color: 'gold', label: '管理员' },
+    USER: { color: 'blue', label: '普通用户' },
+}
+
 export default function UserManagePage() {
     const { message } = App.useApp()
     const [users, setUsers] = useState<UserAdminDTO[]>([])
-    const [roles, setRoles] = useState<RoleDTO[]>([])
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     const [size, setSize] = useState(10)
     const [keyword, setKeyword] = useState('')
     const [status, setStatus] = useState<number | undefined>(undefined)
-    const [roleId, setRoleId] = useState<number | undefined>(undefined)
+    const [userRole, setUserRole] = useState<UserRole | undefined>(undefined)
     const [loading, setLoading] = useState(false)
 
     const [resetUser, setResetUser] = useState<UserAdminDTO | null>(null)
-    const [assignUser, setAssignUser] = useState<UserAdminDTO | null>(null)
 
     const loadUsers = useCallback(async () => {
         setLoading(true)
@@ -35,7 +38,7 @@ export default function UserManagePage() {
                 size,
                 keyword: keyword || undefined,
                 status,
-                roleId,
+                userRole,
             })
             setUsers(data.records)
             setTotal(data.total)
@@ -44,18 +47,13 @@ export default function UserManagePage() {
         } finally {
             setLoading(false)
         }
-    }, [page, size, keyword, status, roleId])
+    }, [page, size, keyword, status, userRole])
 
     useEffect(() => {
+        // 挂载/筛选条件变化即拉取是预期行为
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- 发起请求前设置 loading 是数据请求的固有模式
         void loadUsers()
     }, [loadUsers])
-
-    useEffect(() => {
-        adminApi
-            .listRoles()
-            .then(setRoles)
-            .catch(() => {})
-    }, [])
 
     const handleToggleStatus = async (user: UserAdminDTO, enabled: boolean) => {
         try {
@@ -70,22 +68,15 @@ export default function UserManagePage() {
     const columns: TableProps<UserAdminDTO>['columns'] = [
         { title: 'ID', dataIndex: 'id', width: 72 },
         { title: '用户名', dataIndex: 'username', width: 140 },
-        { title: '昵称', dataIndex: 'nickname', width: 140, render: (v: string | null) => v || '-' },
+        { title: '昵称', dataIndex: 'nickname', width: 140, render: (v: string) => v || '-' },
         {
             title: '角色',
-            dataIndex: 'roles',
-            render: (rs: RoleDTO[]) =>
-                rs.length ? (
-                    <>
-                        {rs.map((r) => (
-                            <Tag key={r.id} color="blue">
-                                {r.name}
-                            </Tag>
-                        ))}
-                    </>
-                ) : (
-                    '-'
-                ),
+            dataIndex: 'userRole',
+            width: 120,
+            render: (r: UserRole) => {
+                const meta = roleMeta[r] ?? { color: 'default', label: r }
+                return <Tag color={meta.color}>{meta.label}</Tag>
+            },
         },
         {
             title: '状态',
@@ -100,18 +91,20 @@ export default function UserManagePage() {
                 />
             ),
         },
-        { title: '创建时间', dataIndex: 'createdAt', width: 160, render: (v: string | null) => formatDate(v) },
+        {
+            title: '创建时间',
+            dataIndex: 'createdTime',
+            width: 160,
+            render: (v: string | null) => formatDate(v),
+        },
         {
             title: '操作',
             key: 'action',
-            width: 200,
+            width: 120,
             render: (_, record) => (
                 <Space>
                     <Button size="small" onClick={() => setResetUser(record)}>
                         重置密码
-                    </Button>
-                    <Button size="small" onClick={() => setAssignUser(record)}>
-                        分配角色
                     </Button>
                 </Space>
             ),
@@ -146,11 +139,14 @@ export default function UserManagePage() {
                 <Select
                     placeholder="角色"
                     allowClear
-                    style={{ width: 160 }}
-                    options={roles.map((r) => ({ value: r.id, label: r.name }))}
+                    style={{ width: 140 }}
+                    options={[
+                        { value: 'ADMIN', label: '管理员' },
+                        { value: 'USER', label: '普通用户' },
+                    ]}
                     onChange={(v) => {
                         setPage(1)
-                        setRoleId(v)
+                        setUserRole(v)
                     }}
                 />
             </Space>
@@ -171,11 +167,9 @@ export default function UserManagePage() {
                     },
                 }}
             />
-            <ResetPasswordModal user={resetUser} onClose={() => setResetUser(null)} onDone={loadUsers} />
-            <AssignRolesModal
-                user={assignUser}
-                roles={roles}
-                onClose={() => setAssignUser(null)}
+            <ResetPasswordModal
+                user={resetUser}
+                onClose={() => setResetUser(null)}
                 onDone={loadUsers}
             />
         </div>
@@ -233,61 +227,6 @@ function ResetPasswordModal({
                     <Input.Password placeholder="新密码（6-64 位）" />
                 </Form.Item>
             </Form>
-        </Modal>
-    )
-}
-
-function AssignRolesModal({
-    user,
-    roles,
-    onClose,
-    onDone,
-}: {
-    user: UserAdminDTO | null
-    roles: RoleDTO[]
-    onClose: () => void
-    onDone: () => void
-}) {
-    const { message } = App.useApp()
-    const [selected, setSelected] = useState<number[]>([])
-    const [loading, setLoading] = useState(false)
-
-    useEffect(() => {
-        setSelected(user?.roles.map((r) => r.id) ?? [])
-    }, [user])
-
-    const handleOk = async () => {
-        if (!user) return
-        setLoading(true)
-        try {
-            await adminApi.assignRoles(user.id, selected)
-            message.success('角色已更新')
-            onClose()
-            onDone()
-        } catch {
-            // 错误已由全局 message 提示
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    return (
-        <Modal
-            open={!!user}
-            title={`分配角色 - ${user?.username ?? ''}`}
-            onOk={handleOk}
-            onCancel={onClose}
-            confirmLoading={loading}
-            destroyOnHidden
-        >
-            <Select
-                mode="multiple"
-                style={{ width: '100%', marginTop: 16 }}
-                value={selected}
-                onChange={setSelected}
-                options={roles.map((r) => ({ value: r.id, label: `${r.name}（${r.code}）` }))}
-                placeholder="选择角色"
-            />
         </Modal>
     )
 }

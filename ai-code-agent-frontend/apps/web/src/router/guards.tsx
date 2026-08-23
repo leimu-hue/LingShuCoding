@@ -23,7 +23,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 /** 需要 ADMIN 角色才能访问；非管理员跳回前台 */
 export function RequireAdmin({ children }: { children: ReactNode }) {
     const user = useAuthStore((s) => s.user)
-    if (!user || !user.roles.some((r) => r.code === 'ADMIN')) {
+    if (!user || user.userRole !== 'ADMIN') {
         return <Navigate to="/chat" replace />
     }
     return <>{children}</>

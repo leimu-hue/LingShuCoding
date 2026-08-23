@@ -13,7 +13,6 @@ const EditorPage = lazy(() => import('../pages/editor/EditorPage'))
 const LoginPage = lazy(() => import('../pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'))
 const UserManagePage = lazy(() => import('../pages/admin/UserManagePage'))
-const RoleManagePage = lazy(() => import('../pages/admin/RoleManagePage'))
 
 function lazyPage(node: ReactNode) {
     return (
@@ -35,7 +34,6 @@ const adminRoutes = [
     { path: 'console', element: lazyPage(<ConsolePage />) },
     { path: 'editor', element: lazyPage(<EditorPage />) },
     { path: 'users', element: lazyPage(<UserManagePage />) },
-    { path: 'roles', element: lazyPage(<RoleManagePage />) },
 ]
 
 export const router = createBrowserRouter([
