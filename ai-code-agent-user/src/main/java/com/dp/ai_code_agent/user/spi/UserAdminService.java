@@ -1,23 +1,23 @@
 package com.dp.ai_code_agent.user.spi;
 
 import com.dp.ai_code_agent.common.result.PageResult;
-import com.dp.ai_code_agent.user.spi.model.RoleDTO;
 import com.dp.ai_code_agent.user.spi.model.UserAdminDTO;
-
-import java.util.List;
+import com.dp.ai_code_agent.user.spi.model.UserRole;
 
 /**
  * 用户管理门面（SPI 契约，零框架依赖），供管理端调用。
+ * <p>
+ * 本地实现仅提供用户维度的最小管理能力；角色/权限等复杂能力后续经第三方权限管理 SPI 接入。
  */
 public interface UserAdminService {
 
     /**
      * 分页查询用户，支持关键字（username/nickname 模糊）、状态、角色过滤。
      */
-    PageResult<UserAdminDTO> page(int page, int size, String keyword, Integer status, Long roleId);
+    PageResult<UserAdminDTO> page(int page, int size, String keyword, Integer status, UserRole userRole);
 
     /**
-     * 用户详情（含角色与权限）。
+     * 用户详情。
      */
     UserAdminDTO detail(Long id);
 
@@ -30,19 +30,4 @@ public interface UserAdminService {
      * 重置密码（BCrypt 后落库），并级联清空会话。
      */
     void resetPassword(Long id, String newPassword);
-
-    /**
-     * 分配角色（先删后插）。
-     */
-    void assignRoles(Long id, List<Long> roleIds);
-
-    /**
-     * 全部角色列表（含权限码树）。
-     */
-    List<RoleDTO> listRoles();
-
-    /**
-     * 给角色分配权限（先删后插）。
-     */
-    void grantPermissions(Long roleId, List<Long> permissionIds);
 }

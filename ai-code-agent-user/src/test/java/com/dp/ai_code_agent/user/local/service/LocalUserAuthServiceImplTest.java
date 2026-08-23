@@ -3,23 +3,17 @@ package com.dp.ai_code_agent.user.local.service;
 import com.dp.ai_code_agent.common.exception.BusinessException;
 import com.dp.ai_code_agent.common.exception.ErrorCode;
 import com.dp.ai_code_agent.user.local.converter.UserConverter;
-import com.dp.ai_code_agent.user.local.mapper.PermissionMapper;
-import com.dp.ai_code_agent.user.local.mapper.RoleMapper;
-import com.dp.ai_code_agent.user.local.mapper.RolePermissionMapper;
 import com.dp.ai_code_agent.user.local.mapper.UserMapper;
-import com.dp.ai_code_agent.user.local.mapper.UserRoleMapper;
-import com.dp.ai_code_agent.user.local.model.Role;
 import com.dp.ai_code_agent.user.local.model.User;
-import com.dp.ai_code_agent.user.local.model.UserRole;
 import com.dp.ai_code_agent.user.local.repository.SessionRepository;
 import com.dp.ai_code_agent.user.local.security.PasswordHasher;
 import com.dp.ai_code_agent.user.spi.model.LoginResult;
 import com.dp.ai_code_agent.user.spi.model.UserIdentity;
+import com.dp.ai_code_agent.user.spi.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,10 +29,6 @@ import static org.mockito.Mockito.when;
 class LocalUserAuthServiceImplTest {
 
     UserMapper userMapper;
-    RoleMapper roleMapper;
-    PermissionMapper permissionMapper;
-    UserRoleMapper userRoleMapper;
-    RolePermissionMapper rolePermissionMapper;
     PasswordHasher passwordHasher;
     SessionRepository sessionRepository;
     UserConverter userConverter;
@@ -48,15 +38,10 @@ class LocalUserAuthServiceImplTest {
     @BeforeEach
     void setUp() {
         userMapper = mock(UserMapper.class);
-        roleMapper = mock(RoleMapper.class);
-        permissionMapper = mock(PermissionMapper.class);
-        userRoleMapper = mock(UserRoleMapper.class);
-        rolePermissionMapper = mock(RolePermissionMapper.class);
         passwordHasher = mock(PasswordHasher.class);
         sessionRepository = mock(SessionRepository.class);
         userConverter = mock(UserConverter.class);
-        service = new LocalUserAuthServiceImpl(userMapper, roleMapper, permissionMapper,
-                userRoleMapper, rolePermissionMapper, passwordHasher, sessionRepository,
+        service = new LocalUserAuthServiceImpl(userMapper, passwordHasher, sessionRepository,
                 userConverter, Duration.ofMinutes(30));
     }
 
@@ -67,6 +52,7 @@ class LocalUserAuthServiceImplTest {
         u.setNickname("Alice");
         u.setStatus(status);
         u.setPasswordHash("hash");
+        u.setUserRole(UserRole.USER);
         return u;
     }
 
@@ -81,30 +67,28 @@ class LocalUserAuthServiceImplTest {
     }
 
     @Test
-    void register_success_savesUserAndAssignsDefaultRole() {
+    void register_success_savesUserWithDefaultRole() {
         when(userMapper.existsByUsername("alice")).thenReturn(false);
         when(passwordHasher.hash("pwd")).thenReturn("hashed");
-        when(roleMapper.selectByCode("USER")).thenReturn(role(2L, "USER"));
         doAnswer(inv -> {
             ((User) inv.getArgument(0)).setId(99L);
             return 1;
         }).when(userMapper).save(any(User.class));
-        UserIdentity identity = new UserIdentity(99L, "alice", "Alice", List.of(), List.of(), true);
-        when(userConverter.toUserIdentity(any(), any(), any())).thenReturn(identity);
+        UserIdentity identity = new UserIdentity(99L, "alice", "Alice", UserRole.USER, true);
+        when(userConverter.toUserIdentity(any(User.class))).thenReturn(identity);
 
         UserIdentity result = service.register("alice", "pwd", "Alice");
 
         assertThat(result).isEqualTo(identity);
         verify(userMapper).save(any(User.class));
-        verify(userRoleMapper).save(new UserRole(99L, 2L));
     }
 
     @Test
     void login_success_returnsToken() {
         when(userMapper.selectByUsername("alice")).thenReturn(user(1L, 1));
         when(passwordHasher.matches("pwd", "hash")).thenReturn(true);
-        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", List.of(), List.of(), true);
-        when(userConverter.toUserIdentity(any(), any(), any())).thenReturn(identity);
+        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", UserRole.USER, true);
+        when(userConverter.toUserIdentity(any(User.class))).thenReturn(identity);
 
         LoginResult r = service.login("alice", "pwd");
 
@@ -150,7 +134,7 @@ class LocalUserAuthServiceImplTest {
 
     @Test
     void resolve_validToken_returnsIdentity() {
-        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", List.of(), List.of(), true);
+        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", UserRole.USER, true);
         when(sessionRepository.find("tok", Duration.ofMinutes(30))).thenReturn(Optional.of(identity));
 
         assertThat(service.resolve("tok")).isEqualTo(identity);
@@ -167,19 +151,11 @@ class LocalUserAuthServiceImplTest {
 
     @Test
     void resolve_disabledUser_throwsTokenInvalid() {
-        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", List.of(), List.of(), false);
+        UserIdentity identity = new UserIdentity(1L, "alice", "Alice", UserRole.USER, false);
         when(sessionRepository.find("tok", Duration.ofMinutes(30))).thenReturn(Optional.of(identity));
 
         assertThatThrownBy(() -> service.resolve("tok"))
                 .isInstanceOf(BusinessException.class)
                 .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.TOKEN_INVALID));
-    }
-
-    private Role role(long id, String code) {
-        Role r = new Role();
-        r.setId(id);
-        r.setCode(code);
-        r.setName(code);
-        return r;
     }
 }

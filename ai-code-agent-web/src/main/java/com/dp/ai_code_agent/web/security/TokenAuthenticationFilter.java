@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,9 +39,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(BEARER_PREFIX.length());
             try {
                 UserIdentity user = userAuthService.resolve(token);
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                user.roles().forEach(r -> authorities.add(new SimpleGrantedAuthority("ROLE_" + r.code())));
-                user.permissions().forEach(p -> authorities.add(new SimpleGrantedAuthority(p.code())));
+                List<GrantedAuthority> authorities = List.of(
+                        new SimpleGrantedAuthority("ROLE_" + user.userRole().name()));
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

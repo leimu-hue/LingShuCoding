@@ -42,7 +42,7 @@ class UserAuthFlowIT {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.username").value(username))
                 .andExpect(jsonPath("$.data.enabled").value(true))
-                .andExpect(jsonPath("$.data.roles[0].code").value("USER"));
+                .andExpect(jsonPath("$.data.userRole").value("USER"));
 
         // 2. 重复注册 → 1001
         mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)

@@ -1,8 +1,7 @@
 package com.dp.ai_code_agent.user.local.repository;
 
-import com.dp.ai_code_agent.user.spi.model.PermissionDTO;
-import com.dp.ai_code_agent.user.spi.model.RoleDTO;
 import com.dp.ai_code_agent.user.spi.model.UserIdentity;
+import com.dp.ai_code_agent.user.spi.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.SetOperations;
@@ -11,7 +10,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,10 +42,7 @@ class SessionRepositoryTest {
     }
 
     private UserIdentity user() {
-        return new UserIdentity(1L, "alice", "Alice",
-                List.of(new RoleDTO(1L, "USER", "普通用户", List.of(new PermissionDTO(1L, "user:view", "查看用户")))),
-                List.of(new PermissionDTO(1L, "user:view", "查看用户")),
-                true);
+        return new UserIdentity(1L, "alice", "Alice", UserRole.USER, true);
     }
 
     @Test

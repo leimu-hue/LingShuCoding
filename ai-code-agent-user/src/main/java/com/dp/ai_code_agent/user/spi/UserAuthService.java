@@ -11,7 +11,7 @@ import com.dp.ai_code_agent.user.spi.model.UserIdentity;
 public interface UserAuthService {
 
     /**
-     * 注册新用户，用户名唯一，默认分配 {@code USER} 角色。
+     * 注册新用户，用户名唯一，默认角色为 {@link com.dp.ai_code_agent.user.spi.model.UserRole#USER}。
      */
     UserIdentity register(String username, String password, String nickname);
 

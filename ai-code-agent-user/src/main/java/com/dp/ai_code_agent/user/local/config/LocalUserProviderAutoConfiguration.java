@@ -1,11 +1,7 @@
 package com.dp.ai_code_agent.user.local.config;
 
 import com.dp.ai_code_agent.user.local.converter.UserConverter;
-import com.dp.ai_code_agent.user.local.mapper.PermissionMapper;
-import com.dp.ai_code_agent.user.local.mapper.RoleMapper;
-import com.dp.ai_code_agent.user.local.mapper.RolePermissionMapper;
 import com.dp.ai_code_agent.user.local.mapper.UserMapper;
-import com.dp.ai_code_agent.user.local.mapper.UserRoleMapper;
 import com.dp.ai_code_agent.user.local.repository.SessionRepository;
 import com.dp.ai_code_agent.user.local.security.PasswordHasher;
 import com.dp.ai_code_agent.user.local.service.LocalUserAdminServiceImpl;
@@ -31,21 +27,17 @@ public class LocalUserProviderAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(UserAuthService.class)
-    UserAuthService userAuthService(UserMapper userMapper, RoleMapper roleMapper, PermissionMapper permissionMapper,
-                                    UserRoleMapper userRoleMapper, RolePermissionMapper rolePermissionMapper,
-                                    PasswordHasher passwordHasher, SessionRepository sessionRepository,
-                                    UserConverter userConverter, UserProperties properties) {
-        return new LocalUserAuthServiceImpl(userMapper, roleMapper, permissionMapper, userRoleMapper,
-                rolePermissionMapper, passwordHasher, sessionRepository, userConverter, properties.sessionTtl());
+    UserAuthService userAuthService(UserMapper userMapper, PasswordHasher passwordHasher,
+                                    SessionRepository sessionRepository, UserConverter userConverter,
+                                    UserProperties properties) {
+        return new LocalUserAuthServiceImpl(userMapper, passwordHasher, sessionRepository, userConverter,
+                properties.sessionTtl());
     }
 
     @Bean
     @ConditionalOnMissingBean(UserAdminService.class)
-    UserAdminService userAdminService(UserMapper userMapper, RoleMapper roleMapper, PermissionMapper permissionMapper,
-                                      UserRoleMapper userRoleMapper, RolePermissionMapper rolePermissionMapper,
-                                      PasswordHasher passwordHasher, SessionRepository sessionRepository,
-                                      UserConverter userConverter) {
-        return new LocalUserAdminServiceImpl(userMapper, roleMapper, permissionMapper, userRoleMapper,
-                rolePermissionMapper, passwordHasher, sessionRepository, userConverter);
+    UserAdminService userAdminService(UserMapper userMapper, PasswordHasher passwordHasher,
+                                      SessionRepository sessionRepository, UserConverter userConverter) {
+        return new LocalUserAdminServiceImpl(userMapper, passwordHasher, sessionRepository, userConverter);
     }
 }

@@ -1,11 +1,7 @@
 package com.dp.ai_code_agent.user.local.config;
 
 import com.dp.ai_code_agent.user.local.converter.UserConverter;
-import com.dp.ai_code_agent.user.local.mapper.PermissionMapper;
-import com.dp.ai_code_agent.user.local.mapper.RoleMapper;
-import com.dp.ai_code_agent.user.local.mapper.RolePermissionMapper;
 import com.dp.ai_code_agent.user.local.mapper.UserMapper;
-import com.dp.ai_code_agent.user.local.mapper.UserRoleMapper;
 import com.dp.ai_code_agent.user.local.repository.SessionRepository;
 import com.dp.ai_code_agent.user.local.security.PasswordHasher;
 import com.dp.ai_code_agent.user.spi.UserAdminService;
@@ -22,10 +18,6 @@ class LocalUserProviderAutoConfigurationTest {
         return new ApplicationContextRunner()
                 .withUserConfiguration(LocalUserProviderAutoConfiguration.class)
                 .withBean(UserMapper.class, () -> mock(UserMapper.class))
-                .withBean(RoleMapper.class, () -> mock(RoleMapper.class))
-                .withBean(PermissionMapper.class, () -> mock(PermissionMapper.class))
-                .withBean(UserRoleMapper.class, () -> mock(UserRoleMapper.class))
-                .withBean(RolePermissionMapper.class, () -> mock(RolePermissionMapper.class))
                 .withBean(PasswordHasher.class, PasswordHasher::new)
                 .withBean(SessionRepository.class, () -> mock(SessionRepository.class))
                 .withBean(UserConverter.class, () -> mock(UserConverter.class));

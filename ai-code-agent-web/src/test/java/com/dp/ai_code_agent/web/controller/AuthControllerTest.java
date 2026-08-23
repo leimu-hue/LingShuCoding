@@ -3,14 +3,13 @@ package com.dp.ai_code_agent.web.controller;
 import com.dp.ai_code_agent.user.spi.UserAuthService;
 import com.dp.ai_code_agent.user.spi.model.LoginResult;
 import com.dp.ai_code_agent.user.spi.model.UserIdentity;
+import com.dp.ai_code_agent.user.spi.model.UserRole;
 import com.dp.ai_code_agent.web.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,7 +37,7 @@ class AuthControllerTest {
     @Test
     void login_ok() throws Exception {
         when(userAuthService.login("alice", "pwd"))
-                .thenReturn(new LoginResult("tok", new UserIdentity(1L, "alice", "Alice", List.of(), List.of(), true)));
+                .thenReturn(new LoginResult("tok", new UserIdentity(1L, "alice", "Alice", UserRole.USER, true)));
 
         mvc.perform(post("/api/auth/login").contentType(APPLICATION_JSON)
                         .content("{\"username\":\"alice\",\"password\":\"pwd\"}"))
@@ -50,7 +49,7 @@ class AuthControllerTest {
     @Test
     void register_ok() throws Exception {
         when(userAuthService.register("bob", "secret1", "Bob"))
-                .thenReturn(new UserIdentity(2L, "bob", "Bob", List.of(), List.of(), true));
+                .thenReturn(new UserIdentity(2L, "bob", "Bob", UserRole.USER, true));
 
         mvc.perform(post("/api/auth/register").contentType(APPLICATION_JSON)
                         .content("{\"username\":\"bob\",\"password\":\"secret1\",\"nickname\":\"Bob\"}"))

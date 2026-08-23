@@ -10,13 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,43 +105,5 @@ class UserAdminFlowIT {
         mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"" + username + "\",\"password\":\"newsecret1\"}"))
                 .andExpect(jsonPath("$.code").value(0));
-    }
-
-    @Test
-    void grantPermissionTakesEffectAfterRelogin() throws Exception {
-        String adminToken = login("admin", "admin123");
-
-        // 取 USER 角色 id 与 user:create / user:view 权限 id
-        MvcResult rolesResult = mvc.perform(get("/api/admin/roles").header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk())
-                .andReturn();
-        String rolesBody = rolesResult.getResponse().getContentAsString();
-        Integer userRoleId = first(JsonPath.<List<Number>>read(rolesBody, "$.data[?(@.code=='USER')].id"));
-        Integer userViewPermId = first(JsonPath.<List<Number>>read(rolesBody,
-                "$.data[?(@.code=='ADMIN')].permissions[?(@.code=='user:view')].id"));
-        Integer userCreatePermId = first(JsonPath.<List<Number>>read(rolesBody,
-                "$.data[?(@.code=='ADMIN')].permissions[?(@.code=='user:create')].id"));
-
-        // 给 USER 角色授予 user:view + user:create
-        mvc.perform(put("/api/admin/roles/" + userRoleId + "/permissions")
-                        .header("Authorization", "Bearer " + adminToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"permissionIds\":[" + userViewPermId + "," + userCreatePermId + "]}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(0));
-
-        // 新用户登录后身份含 user:create 权限码
-        String username = uniqueUser();
-        register(username, "secret1");
-        String userToken = login(username, "secret1");
-        MvcResult meResult = mvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isOk())
-                .andReturn();
-        List<String> permCodes = JsonPath.read(meResult.getResponse().getContentAsString(), "$.data.permissions[*].code");
-        assertThat(permCodes).contains("user:create", "user:view");
-    }
-
-    private static Integer first(List<Number> list) {
-        return list.get(0).intValue();
     }
 }

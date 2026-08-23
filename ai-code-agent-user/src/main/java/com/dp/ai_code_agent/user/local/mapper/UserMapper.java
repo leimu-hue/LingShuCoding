@@ -3,8 +3,8 @@ package com.dp.ai_code_agent.user.local.mapper;
 import cn.xbatis.core.mybatis.mapper.MybatisMapper;
 import cn.xbatis.core.sql.executor.chain.QueryChain;
 import com.dp.ai_code_agent.user.local.model.User;
+import com.dp.ai_code_agent.user.spi.model.UserRole;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,21 +20,21 @@ public interface UserMapper extends MybatisMapper<User> {
         return QueryChain.of(this).eq(User::getUsername, username).exists();
     }
 
-    default List<User> selectPage(String keyword, Integer status, Collection<Long> userIds, int offset, int limit) {
-        return pageQuery(keyword, status, userIds).orderByDesc(User::getId).limit(offset, limit).list();
+    default List<User> selectPage(String keyword, Integer status, UserRole userRole, int offset, int limit) {
+        return pageQuery(keyword, status, userRole).orderByDesc(User::getId).limit(offset, limit).list();
     }
 
-    default int countPage(String keyword, Integer status, Collection<Long> userIds) {
-        return pageQuery(keyword, status, userIds).count();
+    default int countPage(String keyword, Integer status, UserRole userRole) {
+        return pageQuery(keyword, status, userRole).count();
     }
 
-    private QueryChain<User> pageQuery(String keyword, Integer status, Collection<Long> userIds) {
+    private QueryChain<User> pageQuery(String keyword, Integer status, UserRole userRole) {
         QueryChain<User> q = QueryChain.of(this);
         if (status != null) {
             q.eq(User::getStatus, status);
         }
-        if (userIds != null && !userIds.isEmpty()) {
-            q.in(User::getId, userIds);
+        if (userRole != null) {
+            q.eq(User::getUserRole, userRole);
         }
         if (keyword != null && !keyword.isBlank()) {
             String kw = "%" + keyword.trim() + "%";
@@ -43,4 +43,3 @@ public interface UserMapper extends MybatisMapper<User> {
         return q;
     }
 }
-
