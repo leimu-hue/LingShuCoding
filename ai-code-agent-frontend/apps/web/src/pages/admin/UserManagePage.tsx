@@ -1,6 +1,7 @@
 import { App, Button, Form, Input, Modal, Select, Space, Switch, Table, Tag } from 'antd'
 import type { TableProps } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import * as adminApi from '../../api/admin'
 import type { UserAdminDTO, UserRole } from '../../types/user'
 
@@ -19,50 +20,36 @@ const roleMeta: Record<UserRole, { color: string; label: string }> = {
 
 export default function UserManagePage() {
     const { message } = App.useApp()
-    const [users, setUsers] = useState<UserAdminDTO[]>([])
-    const [total, setTotal] = useState(0)
+    const queryClient = useQueryClient()
+
+    // 分页 / 筛选条件只作为「查询 key」存在：key 变化会自动触发重取，无需 effect。
     const [page, setPage] = useState(1)
     const [size, setSize] = useState(10)
     const [keyword, setKeyword] = useState('')
     const [status, setStatus] = useState<number | undefined>(undefined)
     const [userRole, setUserRole] = useState<UserRole | undefined>(undefined)
-    const [loading, setLoading] = useState(false)
 
     const [resetUser, setResetUser] = useState<UserAdminDTO | null>(null)
 
-    const loadUsers = useCallback(async () => {
-        setLoading(true)
-        try {
-            const data = await adminApi.listUsers({
-                page,
-                size,
-                keyword: keyword || undefined,
-                status,
-                userRole,
-            })
-            setUsers(data.records)
-            setTotal(data.total)
-        } catch {
-            // 错误已由全局 message 提示
-        } finally {
-            setLoading(false)
-        }
-    }, [page, size, keyword, status, userRole])
+    const { data, isFetching } = useQuery({
+        queryKey: ['users', { page, size, keyword, status, userRole }],
+        queryFn: () =>
+            adminApi.listUsers({ page, size, keyword: keyword || undefined, status, userRole }),
+        // 翻页 / 筛选期间保留上一页数据，避免整表闪烁（配合 isFetching 显示 loading）
+        placeholderData: (previous) => previous,
+    })
 
-    useEffect(() => {
-        // 挂载/筛选条件变化即拉取是预期行为
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- 发起请求前设置 loading 是数据请求的固有模式
-        void loadUsers()
-    }, [loadUsers])
+    const toggleStatus = useMutation({
+        mutationFn: ({ id, enabled }: { id: number; enabled: boolean; username: string }) =>
+            adminApi.setUserStatus(id, enabled),
+        onSuccess: (_data, { enabled, username }) => {
+            message.success(enabled ? `已启用「${username}」` : `已禁用「${username}」`)
+            void queryClient.invalidateQueries({ queryKey: ['users'] })
+        },
+    })
 
-    const handleToggleStatus = async (user: UserAdminDTO, enabled: boolean) => {
-        try {
-            await adminApi.setUserStatus(user.id, enabled)
-            message.success(enabled ? `已启用「${user.username}」` : `已禁用「${user.username}」`)
-            void loadUsers()
-        } catch {
-            // 错误已由全局 message 提示
-        }
+    const handleToggleStatus = (user: UserAdminDTO, enabled: boolean) => {
+        toggleStatus.mutate({ id: user.id, enabled, username: user.username })
     }
 
     const columns: TableProps<UserAdminDTO>['columns'] = [
@@ -87,7 +74,7 @@ export default function UserManagePage() {
                     checked={enabled}
                     checkedChildren="启用"
                     unCheckedChildren="禁用"
-                    onChange={(v) => void handleToggleStatus(record, v)}
+                    onChange={(v) => handleToggleStatus(record, v)}
                 />
             ),
         },
@@ -153,12 +140,12 @@ export default function UserManagePage() {
             <Table<UserAdminDTO>
                 rowKey="id"
                 columns={columns}
-                dataSource={users}
-                loading={loading}
+                dataSource={data?.records ?? []}
+                loading={isFetching}
                 pagination={{
                     current: page,
                     pageSize: size,
-                    total,
+                    total: data?.total ?? 0,
                     showSizeChanger: true,
                     showTotal: (t) => `共 ${t} 条`,
                     onChange: (p, ps) => {
@@ -167,43 +154,37 @@ export default function UserManagePage() {
                     },
                 }}
             />
-            <ResetPasswordModal
-                user={resetUser}
-                onClose={() => setResetUser(null)}
-                onDone={loadUsers}
-            />
+            <ResetPasswordModal user={resetUser} onClose={() => setResetUser(null)} />
         </div>
     )
 }
 
-function ResetPasswordModal({
-    user,
-    onClose,
-    onDone,
-}: {
-    user: UserAdminDTO | null
-    onClose: () => void
-    onDone: () => void
-}) {
+function ResetPasswordModal({ user, onClose }: { user: UserAdminDTO | null; onClose: () => void }) {
     const { message } = App.useApp()
+    const queryClient = useQueryClient()
     const [form] = Form.useForm<{ newPassword: string }>()
-    const [loading, setLoading] = useState(false)
 
-    const handleOk = async () => {
-        const values = await form.validateFields()
-        if (!user) return
-        setLoading(true)
-        try {
-            await adminApi.resetPassword(user.id, values.newPassword)
+    const resetPassword = useMutation({
+        mutationFn: ({ id, newPassword }: { id: number; newPassword: string }) =>
+            adminApi.resetPassword(id, newPassword),
+        onSuccess: () => {
             message.success('密码已重置')
             form.resetFields()
             onClose()
-            onDone()
+            void queryClient.invalidateQueries({ queryKey: ['users'] })
+        },
+    })
+
+    const handleOk = async () => {
+        if (!user) return
+        let values: { newPassword: string }
+        try {
+            values = await form.validateFields()
         } catch {
-            // 错误已由全局 message 提示
-        } finally {
-            setLoading(false)
+            // 校验失败，antd 已内联提示，不发起请求
+            return
         }
+        resetPassword.mutate({ id: user.id, newPassword: values.newPassword })
     }
 
     return (
@@ -212,7 +193,7 @@ function ResetPasswordModal({
             title={`重置密码 - ${user?.username ?? ''}`}
             onOk={handleOk}
             onCancel={onClose}
-            confirmLoading={loading}
+            confirmLoading={resetPassword.isPending}
             destroyOnHidden
         >
             <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
