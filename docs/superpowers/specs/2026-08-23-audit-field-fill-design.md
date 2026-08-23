@@ -28,7 +28,7 @@
 | 上下文位置 | `user/spi/context/UserContext` | `UserIdentity` 位于 `user-spi`；`ScopedValue` 为 JDK API，不破坏 spi 纯净性 |
 | 上下文填充时机 | `TokenAuthenticationFilter` 内 `UserContext.scoped(user, () -> doFilter)` | 请求边界绑定，覆盖整个 filterChain（含 Service→Mapper 落库） |
 | 填充接入点 | xbatis 全局监听器 `XbatisGlobalConfig.setGlobalOnInsertListener/setGlobalOnUpdateListener` | 优于裸 MyBatis Interceptor：能拿到原始实体、零动态 SQL 包装穿透；全局一次注册，逐实体零注解 |
-| 逻辑删除 | `isDeleted` 标注 `@LogicDelete(beforeValue="false", afterValue="true")` | xbatis 原生能力，查询自动过滤、删除转 update，业务不手写 |
+| 逻辑删除 | `BaseEntity.isDeleted` 标注 `@LogicDelete(beforeValue="false", afterValue="true")`（common 引入 `xbatis-annotation`） | xbatis 原生能力，查询自动过滤、删除转 update，业务不手写 |
 | 无登录态取值 | `0` | 与现有 `DEFAULT 0` 及注释「0 表示系统」一致，不改表结构 |
 | 覆盖策略 | 无条件覆盖 | 审计语义要求 `updateUserId` 恒等于「最后操作者」 |
 
@@ -56,15 +56,16 @@ public final class UserContext {
     public static UserIdentity get() { return CURRENT.isBound() ? CURRENT.get() : null; }
     public static Long getUserId() { UserIdentity u = get(); return u == null ? null : u.id(); }
     public static String getUsername() { UserIdentity u = get(); return u == null ? null : u.username(); }
-    public static <T> T scoped(UserIdentity identity, Callable<T> callable) throws Exception {
-        return ScopedValue.where(CURRENT, identity).call(callable);
+    public static <R, X extends Throwable> R scoped(UserIdentity identity,
+                                                    ScopedValue.CallableOp<R, X> op) throws X {
+        return ScopedValue.where(CURRENT, identity).call(op);
     }
 }
 ```
 
-- 纯 JDK 依赖（`ScopedValue`、`Callable`），不引入 Spring。
+- 纯 JDK 依赖（`ScopedValue`、`ScopedValue.CallableOp`），不引入 Spring。
 - `scoped(...)` 封装绑定细节，filter 与测试调用方不直接接触 `ScopedValue`。
-- `Callable` 可抛出受检异常，`doFilter` 的 `IOException/ServletException` 由 filter 侧 try/catch 转换（见 6.2）。
+- `CallableOp<R, X>` 可抛出指定受检异常 `X`；`doFilter` 抛出的 `IOException/ServletException` 会推导为 `X = Exception`，由 filter 侧 try/catch 转换（见 6.2）。
 
 ### 4.2 `AuditFieldFillListener`（user 模块）
 
@@ -72,32 +73,36 @@ public final class UserContext {
 
 ```java
 public class AuditFieldFillListener
-        implements OnInsertListener<BaseEntity>, OnUpdateListener<BaseEntity> {
+        implements OnInsertListener<Object>, OnUpdateListener<Object> {
 
     @Override
-    public void onInsert(BaseEntity entity) {
-        LocalDateTime now = LocalDateTime.now();
-        Long uid = currentUserId();           // 无登录 → 0
-        entity.setCreatedTime(now);
-        entity.setUpdateTime(now);
-        entity.setCreateAt(uid);
-        entity.setUpdateUserId(uid);
+    public void onInsert(Object entity) {
+        if (entity instanceof BaseEntity base) {
+            LocalDateTime now = LocalDateTime.now();
+            long uid = currentUserId();       // 无登录 → 0
+            base.setCreatedTime(now);
+            base.setUpdateTime(now);
+            base.setCreateAt(uid);
+            base.setUpdateUserId(uid);
+        }
     }
 
     @Override
-    public void onUpdate(BaseEntity entity) {
-        entity.setUpdateTime(LocalDateTime.now());
-        entity.setUpdateUserId(currentUserId());
+    public void onUpdate(Object entity) {
+        if (entity instanceof BaseEntity base) {
+            base.setUpdateTime(LocalDateTime.now());
+            base.setUpdateUserId(currentUserId());
+        }
     }
 
-    private static Long currentUserId() {
+    private static long currentUserId() {
         Long id = UserContext.getUserId();
         return id == null ? 0L : id;
     }
 }
 ```
 
-- 泛型基于 `BaseEntity`，对所有继承 `BaseEntity` 的实体生效。
+- 基于 `Object` 入参 + `instanceof BaseEntity` 守卫，对所有继承 `BaseEntity` 的实体生效；非 `BaseEntity` 实体静默跳过（避免桥接方法强转报 `ClassCastException`）。
 - 不触碰 `isDeleted`（交由 `@LogicDelete`）。
 
 ### 4.3 全局注册（user 模块 `@AutoConfiguration`）
@@ -142,7 +147,8 @@ public class AuditFillAutoConfiguration {
 
 | 文件 | 动作 |
 |---|---|
-| `ai-code-agent-user/.../user/local/model/User.java` | `isDeleted` 加 `@LogicDelete(beforeValue="false", afterValue="true")` |
+| `ai-code-agent-common/pom.xml` | 新增 `cn.xbatis:xbatis-annotation:1.10.6` 依赖 |
+| `ai-code-agent-common/.../common/model/BaseEntity.java` | `isDeleted` 加 `@LogicDelete(beforeValue="false", afterValue="true")` |
 | `ai-code-agent-web/.../web/security/TokenAuthenticationFilter.java` | `resolve` 后 `UserContext.scoped(user, () -> filterChain.doFilter(...))` |
 | `ai-code-agent-user/.../user/local/service/LocalUserAuthServiceImpl.java` | `register` 删除手写审计字段赋值 |
 | `ai-code-agent-user/.../user/local/service/LocalUserAdminServiceImpl.java` | `setStatus`/`resetPassword` 删除手写 `updateTime` |
@@ -150,8 +156,8 @@ public class AuditFillAutoConfiguration {
 
 ## 7. 不变式与约束
 
-- `user-spi` 保持纯净：`UserContext` 仅依赖 JDK（`ScopedValue`/`Callable`），ArchUnit 继续守护 `spi → Spring/xbatis` 禁止。
-- 依赖方向不变：不新增跨模块依赖（`user` 已依赖 `common` + xbatis）。
+- `user-spi` 保持纯净：`UserContext` 仅依赖 JDK（`ScopedValue`/`ScopedValue.CallableOp`），ArchUnit 继续守护 `spi → Spring/xbatis` 禁止。
+- 依赖方向：`common` 新增 `xbatis-annotation`（`@LogicDelete` 注解所在，会传递 `mybatis`），`common` 定位由「纯 JDK」调整为「零 Spring 依赖」；`user-spi` 仍零框架依赖。
 - 数据库结构不变：无登录填 `0` 与 `DEFAULT 0` 一致，不新增 Flyway 迁移。
 - 填充为无条件覆盖：`updateUserId` 恒等于最后操作者。
 

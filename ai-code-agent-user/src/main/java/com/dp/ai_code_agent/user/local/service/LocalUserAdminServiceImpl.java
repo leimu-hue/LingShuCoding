@@ -13,7 +13,6 @@ import com.dp.ai_code_agent.user.spi.model.UserAdminDTO;
 import com.dp.ai_code_agent.user.spi.model.UserRole;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -58,7 +57,6 @@ public class LocalUserAdminServiceImpl implements UserAdminService {
     public void setStatus(Long id, boolean enabled) {
         User user = requireUser(id);
         user.setStatus(enabled ? 1 : 0);
-        user.setUpdateTime(LocalDateTime.now());
         userMapper.update(user);
         if (!enabled) {
             sessionRepository.removeAllByUserId(id);
@@ -70,7 +68,6 @@ public class LocalUserAdminServiceImpl implements UserAdminService {
     public void resetPassword(Long id, String newPassword) {
         User user = requireUser(id);
         user.setPasswordHash(passwordHasher.hash(newPassword));
-        user.setUpdateTime(LocalDateTime.now());
         userMapper.update(user);
         sessionRepository.removeAllByUserId(id);
     }

@@ -9,9 +9,14 @@
     </parent>
     <artifactId>ai-code-agent-common</artifactId>
     <name>ai-code-agent-common</name>
-    <description>通用工具、常量、异常、统一响应体，纯 JDK 零 Spring 依赖</description>
+    <description>通用工具、常量、异常、统一响应体与实体基类，零 Spring 依赖（仅携带 xbatis 注解用于实体映射）</description>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.xbatis</groupId>
+            <artifactId>xbatis-annotation</artifactId>
+            <version>1.10.6</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

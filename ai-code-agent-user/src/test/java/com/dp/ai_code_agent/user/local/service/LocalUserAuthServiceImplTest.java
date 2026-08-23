@@ -12,6 +12,7 @@ import com.dp.ai_code_agent.user.spi.model.UserIdentity;
 import com.dp.ai_code_agent.user.spi.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -81,6 +82,25 @@ class LocalUserAuthServiceImplTest {
 
         assertThat(result).isEqualTo(identity);
         verify(userMapper).save(any(User.class));
+    }
+
+    @Test
+    void register_doesNotSetAuditFields() {
+        when(userMapper.existsByUsername("alice")).thenReturn(false);
+        when(passwordHasher.hash("pwd")).thenReturn("hashed");
+        when(userConverter.toUserIdentity(any(User.class))).thenReturn(
+                new UserIdentity(99L, "alice", "Alice", UserRole.USER, true));
+
+        service.register("alice", "pwd", "Alice");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userMapper).save(captor.capture());
+        User saved = captor.getValue();
+        assertThat(saved.getCreatedTime()).isNull();
+        assertThat(saved.getUpdateTime()).isNull();
+        assertThat(saved.getCreateAt()).isNull();
+        assertThat(saved.getUpdateUserId()).isNull();
+        assertThat(saved.getIsDeleted()).isNull();
     }
 
     @Test

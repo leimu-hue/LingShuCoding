@@ -1,5 +1,6 @@
 package com.dp.ai_code_agent.common.model;
 
+import cn.xbatis.db.annotations.LogicDelete;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -32,5 +33,6 @@ public abstract class BaseEntity {
     private Long updateUserId;
 
     /** 逻辑删除标记 */
+    @LogicDelete(beforeValue = "false", afterValue = "true")
     private Boolean isDeleted;
 }

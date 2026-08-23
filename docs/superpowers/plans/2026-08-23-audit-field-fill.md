@@ -30,7 +30,7 @@
 - Test: `ai-code-agent-user/src/test/java/com/dp/ai_code_agent/user/spi/context/UserContextTest.java`
 
 **Interfaces:**
-- Produces: `UserContext.get():UserIdentity`、`getUserId():Long`、`getUsername():String`、`<T> scoped(UserIdentity, Callable<T>):T`（`throws Exception`）。
+- Produces: `UserContext.get():UserIdentity`、`getUserId():Long`、`getUsername():String`、`<R, X extends Throwable> scoped(UserIdentity, ScopedValue.CallableOp<R,X>):R`（`throws X`）。
 
 - [ ] **Step 1: 写失败测试**
 
@@ -57,15 +57,15 @@ class UserContextTest {
 
     @Test
     void scoped_bindsIdentityWithinScopeAndClearsAfter() throws Exception {
-        UserIdentity inside = UserContext.scoped(ALICE, UserContext::get);
+        UserIdentity inside = UserContext.scoped(ALICE, () -> UserContext.get());
         assertThat(inside).isEqualTo(ALICE);
         assertThat(UserContext.get()).isNull();
     }
 
     @Test
     void scoped_exposesUserIdAndUsername() throws Exception {
-        assertThat(UserContext.scoped(ALICE, UserContext::getUserId)).isEqualTo(1L);
-        assertThat(UserContext.scoped(ALICE, UserContext::getUsername)).isEqualTo("alice");
+        assertThat(UserContext.scoped(ALICE, () -> UserContext.getUserId())).isEqualTo(1L);
+        assertThat(UserContext.scoped(ALICE, () -> UserContext.getUsername())).isEqualTo("alice");
     }
 }
 ```
@@ -81,8 +81,6 @@ Expected: 编译失败（`UserContext` 不存在）。
 package com.dp.ai_code_agent.user.spi.context;
 
 import com.dp.ai_code_agent.user.spi.model.UserIdentity;
-
-import java.util.concurrent.Callable;
 
 /**
  * 当前请求的用户上下文（零框架依赖，仅 JDK）。
@@ -114,9 +112,10 @@ public final class UserContext {
         return identity == null ? null : identity.username();
     }
 
-    /** 在给定身份作用域内执行 {@code callable}，作用域退出后自动解绑。 */
-    public static <T> T scoped(UserIdentity identity, Callable<T> callable) throws Exception {
-        return ScopedValue.where(CURRENT, identity).call(callable);
+    /** 在给定身份作用域内执行 {@code op}，作用域退出后自动解绑。 */
+    public static <R, X extends Throwable> R scoped(UserIdentity identity,
+                                                    ScopedValue.CallableOp<R, X> op) throws X {
+        return ScopedValue.where(CURRENT, identity).call(op);
     }
 }
 ```
@@ -371,7 +370,8 @@ git commit -m "feat(user): 注册 xbatis 全局审计填充监听器"
 ### Task 4: isDeleted 迁移 @LogicDelete + 服务去手写审计字段
 
 **Files:**
-- Modify: `ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/model/User.java`
+- Modify: `ai-code-agent-common/pom.xml`
+- Modify: `ai-code-agent-common/src/main/java/com/dp/ai_code_agent/common/model/BaseEntity.java`
 - Modify: `ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/service/LocalUserAuthServiceImpl.java`
 - Modify: `ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/service/LocalUserAdminServiceImpl.java`
 - Test: `ai-code-agent-user/src/test/java/com/dp/ai_code_agent/user/local/service/LocalUserAuthServiceImplTest.java`
@@ -410,9 +410,19 @@ void register_doesNotSetAuditFields() {
 Run: `D:/base_envir_soft/apache-maven-3.9.16-bin/bin/mvn.cmd -pl ai-code-agent-user -am test -Dtest=LocalUserAuthServiceImplTest -Dsurefire.failIfNoSpecifiedTests=false`
 Expected: FAIL——`register()` 仍手写 `createdTime/updateTime/createAt/updateUserId/isDeleted`。
 
-- [ ] **Step 3: User 实体加 @LogicDelete**
+- [ ] **Step 3: common 引入 xbatis-annotation + BaseEntity 加 @LogicDelete**
 
-`User.java` 增加 import 并对 `isDeleted` 字段加注解：
+`ai-code-agent-common/pom.xml` 新增依赖（`isDeleted` 字段在 `BaseEntity`，而非 `User`）：
+
+```xml
+<dependency>
+    <groupId>cn.xbatis</groupId>
+    <artifactId>xbatis-annotation</artifactId>
+    <version>1.10.6</version>
+</dependency>
+```
+
+`BaseEntity.java` 增加 import 并对 `isDeleted` 字段加注解：
 
 ```java
 import cn.xbatis.db.annotations.LogicDelete;
@@ -447,7 +457,8 @@ Expected: 全部 PASS（含既有 `LocalUserAuthServiceImplTest`/`LocalUserAdmin
 - [ ] **Step 6: 提交**
 
 ```bash
-git add ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/model/User.java \
+git add ai-code-agent-common/pom.xml \
+        ai-code-agent-common/src/main/java/com/dp/ai_code_agent/common/model/BaseEntity.java \
         ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/service/LocalUserAuthServiceImpl.java \
         ai-code-agent-user/src/main/java/com/dp/ai_code_agent/user/local/service/LocalUserAdminServiceImpl.java \
         ai-code-agent-user/src/test/java/com/dp/ai_code_agent/user/local/service/LocalUserAuthServiceImplTest.java
@@ -463,7 +474,7 @@ git commit -m "refactor(user): 审计字段改为框架自动填充，isDeleted 
 - Test: `ai-code-agent-web/src/test/java/com/dp/ai_code_agent/web/security/TokenAuthenticationFilterTest.java`
 
 **Interfaces:**
-- Consumes: `UserContext.scoped(UserIdentity, Callable<T>)`（Task 1）。
+- Consumes: `UserContext.scoped(UserIdentity, ScopedValue.CallableOp<R,X>)`（Task 1）。
 - Produces: 认证通过时下游 filterChain 在 `UserContext` 作用域内执行，作用域结束自动解绑。
 
 - [ ] **Step 1: 写失败测试**

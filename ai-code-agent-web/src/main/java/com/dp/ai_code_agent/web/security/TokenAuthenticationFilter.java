@@ -2,6 +2,7 @@ package com.dp.ai_code_agent.web.security;
 
 import com.dp.ai_code_agent.common.exception.BusinessException;
 import com.dp.ai_code_agent.user.spi.UserAuthService;
+import com.dp.ai_code_agent.user.spi.context.UserContext;
 import com.dp.ai_code_agent.user.spi.model.UserIdentity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,20 +35,39 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith(BEARER_PREFIX)) {
-            String token = header.substring(BEARER_PREFIX.length());
-            try {
-                UserIdentity user = userAuthService.resolve(token);
-                List<GrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + user.userRole().name()));
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (BusinessException ignored) {
-                SecurityContextHolder.clearContext();
-            }
+        UserIdentity user = resolveUser(request);
+        if (user == null) {
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + user.userRole().name()));
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(user, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            UserContext.scoped(user, () -> {
+                filterChain.doFilter(request, response);
+                return null;
+            });
+        } catch (ServletException | IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+    private UserIdentity resolveUser(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+        String token = header.substring(BEARER_PREFIX.length());
+        try {
+            return userAuthService.resolve(token);
+        } catch (BusinessException ignored) {
+            return null;
+        }
     }
 }

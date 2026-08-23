@@ -15,7 +15,6 @@ import com.dp.ai_code_agent.user.spi.model.UserRole;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 /**
  * {@link UserAuthService} 的本地实现：注册 / 登录 / 注销 / resolve。
@@ -52,12 +51,6 @@ public class LocalUserAuthServiceImpl implements UserAuthService {
         user.setNickname(nickname == null ? "" : nickname);
         user.setStatus(1);
         user.setUserRole(UserRole.USER);
-        user.setIsDeleted(false);
-        user.setCreateAt(0L);
-        user.setUpdateUserId(0L);
-        LocalDateTime now = LocalDateTime.now();
-        user.setCreatedTime(now);
-        user.setUpdateTime(now);
         userMapper.save(user);
         return buildIdentity(user);
     }

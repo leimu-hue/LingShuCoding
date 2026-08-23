@@ -1,1 +1,2 @@
 com.dp.ai_code_agent.user.local.config.LocalUserProviderAutoConfiguration
+com.dp.ai_code_agent.user.audit.AuditFillAutoConfiguration
