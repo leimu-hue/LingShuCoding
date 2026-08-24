@@ -1,34 +1,10 @@
 import { LockOutlined, SmileOutlined, UserOutlined } from '@ant-design/icons'
-import { App, Button, Card, Form, Input, Typography } from 'antd'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../../store/authStore'
-
-interface RegisterForm {
-    username: string
-    nickname?: string
-    password: string
-    confirm: string
-}
+import { Button, Card, Form, Input, Typography } from 'antd'
+import { Link } from 'react-router-dom'
+import { useRegister, type RegisterForm } from './hooks/useRegister'
 
 export default function RegisterPage() {
-    const { message } = App.useApp()
-    const register = useAuthStore((s) => s.register)
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(false)
-
-    const onFinish = async (values: RegisterForm) => {
-        setLoading(true)
-        try {
-            await register(values.username, values.password, values.nickname)
-            message.success('注册成功')
-            navigate('/chat', { replace: true })
-        } catch {
-            // 错误已由全局 message 提示
-        } finally {
-            setLoading(false)
-        }
-    }
+    const { loading, onFinish } = useRegister()
 
     return (
         <div

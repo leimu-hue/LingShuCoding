@@ -1,35 +1,10 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { App, Button, Card, Form, Input, Typography } from 'antd'
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../../store/authStore'
-
-interface LoginForm {
-    username: string
-    password: string
-}
+import { Button, Card, Form, Input, Typography } from 'antd'
+import { Link } from 'react-router-dom'
+import { useLogin, type LoginForm } from './hooks/useLogin'
 
 export default function LoginPage() {
-    const { message } = App.useApp()
-    const login = useAuthStore((s) => s.login)
-    const navigate = useNavigate()
-    const location = useLocation()
-    const [loading, setLoading] = useState(false)
-
-    const from = (location.state as { from?: string } | null)?.from ?? '/chat'
-
-    const onFinish = async (values: LoginForm) => {
-        setLoading(true)
-        try {
-            await login(values.username, values.password)
-            message.success('登录成功')
-            navigate(from, { replace: true })
-        } catch {
-            // 错误已由全局 message 提示
-        } finally {
-            setLoading(false)
-        }
-    }
+    const { loading, onFinish } = useLogin()
 
     return (
         <div
