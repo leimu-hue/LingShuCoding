@@ -1,6 +1,7 @@
 import js from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import prettierPlugin from 'eslint-plugin-prettier'
+import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -10,6 +11,7 @@ export default tseslint.config(
     js.configs.recommended,
     ...tseslint.configs.recommended,
     reactHooks.configs.flat['recommended-latest'],
+    reactCompiler.configs.recommended,
     {
         files: ['**/*.{ts,tsx}'],
         languageOptions: {

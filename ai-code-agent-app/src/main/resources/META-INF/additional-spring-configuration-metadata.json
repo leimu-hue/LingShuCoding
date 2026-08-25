@@ -1,0 +1,66 @@
+{
+  "groups": [
+    {
+      "name": "app.user",
+      "type": "com.dp.ai_code_agent.user.local.config.UserProperties",
+      "sourceType": "com.dp.ai_code_agent.user.local.config.UserProperties",
+      "description": "用户模块配置项（app.user.*）"
+    },
+    {
+      "name": "web.cors",
+      "type": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "全局跨域配置项（web.cors.*）"
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.user.provider",
+      "type": "java.lang.String",
+      "sourceType": "com.dp.ai_code_agent.user.local.config.UserProperties",
+      "description": "用户认证提供方开关，默认 local",
+      "defaultValue": "local"
+    },
+    {
+      "name": "app.user.session-ttl",
+      "type": "java.time.Duration",
+      "sourceType": "com.dp.ai_code_agent.user.local.config.UserProperties",
+      "description": "会话过期时间（滑续），默认 30 分钟",
+      "defaultValue": "30m"
+    },
+    {
+      "name": "web.cors.allowed-origin-patterns",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "允许的来源匹配模式",
+      "defaultValue": ["*"]
+    },
+    {
+      "name": "web.cors.allowed-methods",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "允许的请求方法",
+      "defaultValue": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+    },
+    {
+      "name": "web.cors.allowed-headers",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "允许的请求头",
+      "defaultValue": ["*"]
+    },
+    {
+      "name": "web.cors.allow-credentials",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "是否允许携带凭证"
+    },
+    {
+      "name": "web.cors.max-age",
+      "type": "java.lang.Long",
+      "sourceType": "com.dp.ai_code_agent.web.config.CorsProperties",
+      "description": "预检请求缓存时间（秒）",
+      "defaultValue": "3600"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { App } from 'antd'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 import * as adminApi from '../../../api/admin'
-import type { UserAdminDTO, UserRole } from '../../../types/user'
+import type { PageResult, UserAdminDTO, UserRole } from '../../../types/user'
 
 /**
  * 用户管理页业务逻辑 hook。
@@ -25,13 +25,16 @@ export function useUserTable() {
         queryFn: () =>
             adminApi.listUsers({ page, size, keyword: keyword || undefined, status, userRole }),
         // 翻页 / 筛选期间保留上一页数据，避免整表闪烁（配合 isFetching 显示 loading）
-        placeholderData: (previous) => previous,
+        placeholderData: (previous: PageResult<UserAdminDTO> | undefined) => previous,
     })
 
     const { mutate: toggleStatus } = useMutation({
         mutationFn: ({ id, enabled }: { id: number; enabled: boolean; username: string }) =>
             adminApi.setUserStatus(id, enabled),
-        onSuccess: (_data, { enabled, username }) => {
+        onSuccess: (
+            _data: void,
+            { enabled, username }: { id: number; enabled: boolean; username: string },
+        ) => {
             message.success(enabled ? `已启用「${username}」` : `已禁用「${username}」`)
             void queryClient.invalidateQueries({ queryKey: ['users'] })
         },
