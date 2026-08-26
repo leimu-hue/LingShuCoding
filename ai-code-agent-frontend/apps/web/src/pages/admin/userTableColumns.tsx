@@ -1,7 +1,8 @@
 import { Button, Space, Switch, Tag } from 'antd'
 import type { TableProps } from 'antd'
-import type { UserAdminDTO, UserRole } from '../../types/user'
-import { formatDate, roleMeta } from './userConstants'
+import type { UserAdminDTO, UserRole } from '@/types/user'
+import { roleMeta } from '@/constants/user'
+import { formatDate } from '@/utils/format'
 
 /** 表格列所需的回调动作（由页面组合层注入，保持列定义为纯函数） */
 export interface UserTableColumnActions {

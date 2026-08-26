@@ -1,7 +1,7 @@
 import { Spin } from 'antd'
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { useAuthStore } from '@/store/authStore'
 
 const loadingFallback = <Spin style={{ display: 'block', margin: '96px auto' }} />
 

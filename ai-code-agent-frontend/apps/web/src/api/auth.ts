@@ -1,5 +1,5 @@
 import { http } from '@ai-code-agent/shared'
-import type { LoginResult, UserIdentity } from '../types/user'
+import type { LoginResult, UserIdentity } from '@/types/user'
 
 export function login(username: string, password: string) {
     return http<LoginResult>({ url: '/auth/login', method: 'POST', data: { username, password } })

@@ -1,7 +1,7 @@
 import { App, Form, Input, Modal } from 'antd'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import * as adminApi from '../../api/admin'
-import type { UserAdminDTO } from '../../types/user'
+import * as adminApi from '@/api/admin'
+import type { UserAdminDTO } from '@/types/user'
 
 interface ResetPasswordModalProps {
     user: UserAdminDTO | null

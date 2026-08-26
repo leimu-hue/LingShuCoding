@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { getAuthToken, setAuthToken } from '@ai-code-agent/shared'
-import * as authApi from '../api/auth'
-import type { UserIdentity } from '../types/user'
+import * as authApi from '@/api/auth'
+import type { UserIdentity } from '@/types/user'
 
 interface AuthState {
     token: string | null

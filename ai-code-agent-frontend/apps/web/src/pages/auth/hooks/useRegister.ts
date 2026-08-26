@@ -1,7 +1,7 @@
 import { App } from 'antd'
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../../../store/authStore'
+import { useAuthStore } from '@/store/authStore'
 
 export interface RegisterForm {
     username: string

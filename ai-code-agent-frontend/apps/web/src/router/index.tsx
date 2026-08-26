@@ -1,18 +1,18 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { Spin } from 'antd'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import AdminLayout from '../layouts/AdminLayout'
-import FrontLayout from '../layouts/FrontLayout'
-import { RequireAdmin, RequireAuth } from './guards'
+import AdminLayout from '@/layouts/AdminLayout'
+import FrontLayout from '@/layouts/FrontLayout'
+import { RequireAdmin, RequireAuth } from '@/router/guards'
 
 // 路由级懒加载：仅在使用时按需加载对应页面，
 // 重型依赖（如编辑器页的 @xyflow/react）因此不会进入首屏包。
-const ChatPage = lazy(() => import('../pages/chat/ChatPage'))
-const ConsolePage = lazy(() => import('../pages/console/ConsolePage'))
-const EditorPage = lazy(() => import('../pages/editor/EditorPage'))
-const LoginPage = lazy(() => import('../pages/auth/LoginPage'))
-const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'))
-const UserManagePage = lazy(() => import('../pages/admin/UserManagePage'))
+const ChatPage = lazy(() => import('@/pages/chat/ChatPage'))
+const ConsolePage = lazy(() => import('@/pages/console/ConsolePage'))
+const EditorPage = lazy(() => import('@/pages/editor/EditorPage'))
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
+const UserManagePage = lazy(() => import('@/pages/admin/UserManagePage'))
 
 function lazyPage(node: ReactNode) {
     return (

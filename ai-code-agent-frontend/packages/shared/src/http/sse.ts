@@ -1,5 +1,5 @@
-import { authHeaders } from '../auth.ts'
-import { reportSessionExpired } from '../errorBus.ts'
+import { authHeaders } from '@ai-code-agent/shared/auth'
+import { reportSessionExpired } from '@ai-code-agent/shared/errorBus'
 
 export interface SseEvent {
     data: string

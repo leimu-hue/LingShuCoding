@@ -1,4 +1,4 @@
-import type { UserRole } from '../../types/user'
+import type { UserRole } from '@/types/user'
 
 /** 角色 → 展示元数据（不依赖组件状态，模块级常量） */
 export const roleMeta: Record<UserRole, { color: string; label: string }> = {
@@ -17,11 +17,3 @@ export const userRoleOptions = [
     { value: 'ADMIN', label: '管理员' },
     { value: 'USER', label: '普通用户' },
 ]
-
-/** 展示创建时间（ISO 串 → YYYY-MM-DD HH:mm） */
-export function formatDate(value: string | null): string {
-    if (typeof value !== 'string' || value.length === 0) {
-        return '-'
-    }
-    return value.replace('T', ' ').slice(0, 16)
-}

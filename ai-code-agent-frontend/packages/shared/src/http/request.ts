@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios'
-import { authHeaders } from '../auth.ts'
-import { reportApiError, reportSessionExpired } from '../errorBus.ts'
-import { type Result, SUCCESS_CODE } from '../types/result.ts'
+import { authHeaders } from '@ai-code-agent/shared/auth'
+import { reportApiError, reportSessionExpired } from '@ai-code-agent/shared/errorBus'
+import { type Result, SUCCESS_CODE } from '@ai-code-agent/shared/types/result'
 
 export interface RequestOptions extends AxiosRequestConfig {
     /**

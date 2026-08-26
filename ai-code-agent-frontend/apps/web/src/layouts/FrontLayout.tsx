@@ -1,8 +1,8 @@
 import { CommentOutlined } from '@ant-design/icons'
 import { Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import AppFooter from '../components/AppFooter'
-import UserMenu from '../components/UserMenu'
+import AppFooter from '@/components/AppFooter'
+import UserMenu from '@/components/UserMenu'
 import logo from '@root/logo.svg'
 
 const { Header, Content } = Layout

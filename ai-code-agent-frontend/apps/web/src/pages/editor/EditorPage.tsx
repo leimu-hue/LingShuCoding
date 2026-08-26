@@ -1,6 +1,6 @@
 import { AppCanvas } from '@ai-code-agent/canvas'
 import { Card, Empty, Flex, Input, Typography } from 'antd'
-import { useEditor } from './hooks/useEditor'
+import { useEditor } from '@/pages/editor/hooks/useEditor'
 
 export default function EditorPage() {
     const {

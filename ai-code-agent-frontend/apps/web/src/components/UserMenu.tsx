@@ -1,7 +1,7 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { App, Avatar, Dropdown, Space, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { useAuthStore } from '@/store/authStore'
 
 /**
  * 顶栏用户菜单：展示当前登录用户昵称，下拉提供退出登录。

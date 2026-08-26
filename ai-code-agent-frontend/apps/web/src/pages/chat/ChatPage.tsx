@@ -1,6 +1,6 @@
 import { SendOutlined, StopOutlined } from '@ant-design/icons'
 import { Button, Input, Spin, Typography, theme } from 'antd'
-import { useChat } from './hooks/useChat'
+import { useChat } from '@/pages/chat/hooks/useChat'
 
 export default function ChatPage() {
     const { token } = theme.useToken()

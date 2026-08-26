@@ -8,8 +8,8 @@ import {
 } from '@ant-design/icons'
 import { Layout, Menu, Typography, theme } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import UserMenu from '../components/UserMenu'
-import { useAppShellStore } from '../store/appShell'
+import UserMenu from '@/components/UserMenu'
+import { useAppShellStore } from '@/store/appShell'
 
 const { Header, Sider, Content } = Layout
 

@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Card, Form, Input, Typography } from 'antd'
 import { Link } from 'react-router-dom'
-import { useLogin, type LoginForm } from './hooks/useLogin'
+import { useLogin, type LoginForm } from '@/pages/auth/hooks/useLogin'
 
 export default function LoginPage() {
     const { loading, onFinish } = useLogin()

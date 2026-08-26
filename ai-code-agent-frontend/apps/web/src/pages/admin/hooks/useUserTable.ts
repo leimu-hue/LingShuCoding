@@ -1,8 +1,8 @@
 import { App } from 'antd'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
-import * as adminApi from '../../../api/admin'
-import type { PageResult, UserAdminDTO, UserRole } from '../../../types/user'
+import * as adminApi from '@/api/admin'
+import type { PageResult, UserAdminDTO, UserRole } from '@/types/user'
 
 /**
  * 用户管理页业务逻辑 hook。

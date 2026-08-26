@@ -1,6 +1,6 @@
 import { Input, Select, Space } from 'antd'
-import type { UserRole } from '../../types/user'
-import { statusOptions, userRoleOptions } from './userConstants'
+import type { UserRole } from '@/types/user'
+import { statusOptions, userRoleOptions } from '@/constants/user'
 
 interface UserFilterBarProps {
     onSearch: (value: string) => void

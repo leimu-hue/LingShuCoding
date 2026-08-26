@@ -4,7 +4,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@root/*": ["../../*"]
+      "@root/*": ["../../*"],
+      "@ai-code-agent/shared/*": ["../../packages/shared/src/*"],
+      "@ai-code-agent/canvas/*": ["../../packages/canvas/src/*"]
     },
     "types": [
       "vite/client"

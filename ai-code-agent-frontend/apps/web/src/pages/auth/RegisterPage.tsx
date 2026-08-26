@@ -1,7 +1,7 @@
 import { LockOutlined, SmileOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Card, Form, Input, Typography } from 'antd'
 import { Link } from 'react-router-dom'
-import { useRegister, type RegisterForm } from './hooks/useRegister'
+import { useRegister, type RegisterForm } from '@/pages/auth/hooks/useRegister'
 
 export default function RegisterPage() {
     const { loading, onFinish } = useRegister()

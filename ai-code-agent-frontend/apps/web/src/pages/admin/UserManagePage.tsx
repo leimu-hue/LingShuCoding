@@ -1,10 +1,10 @@
 import { Table } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
-import type { UserAdminDTO } from '../../types/user'
-import ResetPasswordModal from './ResetPasswordModal'
-import UserFilterBar from './UserFilterBar'
-import { useUserTable } from './hooks/useUserTable'
-import { buildUserColumns } from './userTableColumns'
+import type { UserAdminDTO } from '@/types/user'
+import ResetPasswordModal from '@/pages/admin/ResetPasswordModal'
+import UserFilterBar from '@/pages/admin/UserFilterBar'
+import { useUserTable } from '@/pages/admin/hooks/useUserTable'
+import { buildUserColumns } from '@/pages/admin/userTableColumns'
 
 /**
  * 用户管理页（组合层）：仅负责组合 hook 与子组件，保持 JSX 层级扁平。

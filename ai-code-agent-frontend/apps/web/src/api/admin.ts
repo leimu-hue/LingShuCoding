@@ -1,5 +1,5 @@
 import { http } from '@ai-code-agent/shared'
-import type { PageResult, UserAdminDTO, UserRole } from '../types/user'
+import type { PageResult, UserAdminDTO, UserRole } from '@/types/user'
 
 export interface UserPageParams {
     page?: number

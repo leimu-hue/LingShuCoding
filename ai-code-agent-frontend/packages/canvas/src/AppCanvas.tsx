@@ -12,7 +12,7 @@ import {
     type OnSelectionChangeParams,
     ReactFlow,
 } from '@xyflow/react'
-import { ElementNode } from './ElementNode'
+import { ElementNode } from '@ai-code-agent/canvas/ElementNode'
 
 const nodeTypes: NodeTypes = { element: ElementNode }
 
